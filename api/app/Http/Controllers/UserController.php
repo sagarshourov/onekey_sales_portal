@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Validator;
 
 use App\Models\User;
 
@@ -14,13 +14,18 @@ class UserController extends BaseController
      *
      * @return \Illuminate\Http\Response
      */
+
+    private function users()
+    {
+        $users = User::all();
+        return $users;
+    }
+
+
     public function index()
     {
         //
-
-        $users = User::all();
-
-        return $this->sendResponse($users, 'User retrive successfully.');
+        return $this->sendResponse($this->users(), 'User retrive successfully.');
     }
 
     /**
@@ -42,6 +47,29 @@ class UserController extends BaseController
     public function store(Request $request)
     {
         //
+        $input = $request->all();
+
+
+        $validator = Validator::make($input, [
+            'first_name' => 'required',
+            'last_name' => 'required',
+            'email' => 'required|email|regex:/(.+)@(.+)\.(.+)/i|unique:users',
+        ]);
+
+        if ($validator->fails()) {
+
+
+
+
+            return $this->sendError('Validation Error.', $validator->errors());
+        }
+
+        $input['password'] = bcrypt($input['password']);
+
+
+
+        User::create($input);
+        return $this->sendResponse($this->users(), 'User retrive successfully.');
     }
 
     /**
@@ -76,6 +104,22 @@ class UserController extends BaseController
     public function update(Request $request, $id)
     {
         //
+
+        $input = $request->all();
+
+        if (isset($input['password'])) {
+            $input['password'] = bcrypt($input['password']);
+        }
+
+
+        User::updateOrCreate(
+            [
+                'id'   => $input['id'],
+            ],
+            $input
+
+        );
+        return $this->sendResponse($input, 'User Info Updated successfully.');
     }
 
     /**
@@ -87,5 +131,9 @@ class UserController extends BaseController
     public function destroy($id)
     {
         //
+
+        User::find($id)->delete();
+
+        return $this->sendResponse($this->users(), 'Delete Call successfully.');
     }
 }
