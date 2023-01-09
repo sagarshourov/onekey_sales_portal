@@ -15,4 +15,8 @@ class Package extends Model
 
     protected $dates = ['deleted_at'];
 
+    protected $fillable = [
+        'id','title'
+    ];
+
 }

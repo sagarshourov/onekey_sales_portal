@@ -25,9 +25,9 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            return Calls::where('user_id', $user->id)->with(['extra', 'results', 'fresults', 'priority', 'status', 'package', 'cancel_reason', 'user'])->get();
+            return Calls::where('user_id', $user->id)->with(['extra', 'section', 'results', 'fresults', 'priority', 'status', 'package', 'cancel_reason', 'user'])->get();
         } else {
-            return Calls::with(['extra', 'results', 'fresults', 'priority', 'status', 'package', 'cancel_reason', 'user' => function ($q) {
+            return Calls::with(['extra', 'section', 'results', 'fresults', 'priority', 'status', 'package', 'cancel_reason', 'user' => function ($q) {
                 $q->orderBy('id', 'DESC');
             }])->get();
         }
@@ -227,7 +227,7 @@ class CallsController extends BaseController
         $user = Auth::user();
 
 
-        $calls =   Calls::where('user_id', $user->id)->get(['follow_up_date', 'first_name', 'last_name', 'note']);
+        $calls =   Calls::where('user_id', $user->id)->get(['id', 'follow_up_date', 'first_name', 'last_name', 'memo']);
 
         return $this->sendResponse($calls, 'Events Retrieve successfully.');
     }

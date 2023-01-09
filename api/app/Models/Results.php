@@ -10,4 +10,8 @@ class Results extends Model
     protected $table = 'results';
     public $timestamps = true;
 
+    protected $fillable = [
+        'id','title'
+    ];
+
 }

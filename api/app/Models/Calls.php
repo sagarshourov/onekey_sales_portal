@@ -69,4 +69,9 @@ class Calls extends Model
 
         return $this->hasOne(User::class, 'id', 'user_id')->select('id', 'first_name', 'last_name', 'team');
     }
+    public function section()
+    {
+
+        return $this->hasOne(Sections::class, 'id', 'sections')->select('id', 'title');
+    }
 }

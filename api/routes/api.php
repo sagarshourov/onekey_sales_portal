@@ -6,6 +6,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\CallsController;
 
 use App\Http\Controllers\NotiController;
+use App\Http\Controllers\SettingsController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -19,10 +20,10 @@ use App\Http\Controllers\NotiController;
 
 Route::post('register', 'App\Http\Controllers\AuthController@store');
 Route::post('login', 'App\Http\Controllers\AuthController@login');
-
+Route::get('file/{folder}/{path}', 'App\Http\Controllers\FileController@getFile');
 
 Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"], function () {
-
+    Route::post('file_upload', 'App\Http\Controllers\FileController@file_upload');
     Route::get('check/{field}/{value}', 'App\Http\Controllers\CallsController@check');
 
 
@@ -30,6 +31,13 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
     Route::resource('users', UserController::class);
     Route::resource('calls', CallsController::class);
     Route::resource('notifications', NotiController::class);
+
+
+    Route::resource('settings', SettingsController::class);
+
+    Route::get('settings/{table}/{id}', 'App\Http\Controllers\SettingsController@destroy');
+
+
     Route::get('events', 'App\Http\Controllers\CallsController@events');
 });
 
