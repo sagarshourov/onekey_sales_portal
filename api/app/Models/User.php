@@ -45,4 +45,10 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+
+    public function profile()
+    {
+        return $this->hasOne(Files::class, 'user_id', 'id')->select('id','user_id', 'file_path');
+    }
 }

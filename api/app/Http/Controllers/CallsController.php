@@ -25,9 +25,9 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            return Calls::where('user_id', $user->id)->with(['extra', 'section', 'results', 'fresults', 'priority', 'status', 'package', 'cancel_reason', 'user'])->get();
+            return Calls::where('user_id', $user->id)->with(['extra', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->get();
         } else {
-            return Calls::with(['extra', 'section', 'results', 'fresults', 'priority', 'status', 'package', 'cancel_reason', 'user' => function ($q) {
+            return Calls::with(['extra',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user' => function ($q) {
                 $q->orderBy('id', 'DESC');
             }])->get();
         }
@@ -60,7 +60,7 @@ class CallsController extends BaseController
     {
         //
 
-        return $this->sendResponse($this->get_calls(), 'Retrieve successfully.');
+        return $this->sendResponse($this->get_calls(), 'Calls Retrieve successfully.');
     }
 
     /**
@@ -120,7 +120,7 @@ class CallsController extends BaseController
 
             //  $this->extra_insert($input, array('note', 'last_status_notes'));
 
-            return $this->sendResponse($this->get_calls(), 'Update successfully.');
+            return $this->sendResponse($this->get_calls(), 'Call Update successfully.');
         } else {
 
             $messages = [
@@ -140,7 +140,7 @@ class CallsController extends BaseController
 
 
             Calls::create($input);
-            return $this->sendResponse($this->get_calls(), 'Add calls successfully.');
+            return $this->sendResponse($this->get_calls(), 'Calls add  successfully.');
         }
     }
 
@@ -180,12 +180,12 @@ class CallsController extends BaseController
             Calls::whereIn('id', $request->ids)->update([$request->name => $request->value]);
             return $this->sendResponse($this->get_calls(), 'Bulk Update Call successfully.');
         } else {
-
-
+            $call = Calls::find($id);
             if ($request->type == 2) {
+
                 $input['call_id'] = (int) $id;
                 $input['field'] = $request->name;
-                $input['value'] = $request->value;
+                $input['value'] =  $call[$request->name];
                 CallsExtra::create($input);
             }
 
@@ -217,7 +217,7 @@ class CallsController extends BaseController
 
         Calls::whereIn('id', $request->all())->forceDelete();
 
-        return $this->sendResponse($this->get_calls(), 'Delete Call successfully.');
+        return $this->sendResponse($this->get_calls(), 'Call deleted successfully.');
     }
 
 

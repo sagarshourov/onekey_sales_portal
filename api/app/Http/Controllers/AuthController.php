@@ -155,7 +155,7 @@ class AuthController  extends BaseController
         $return['birth'] = $users->birth_date;
         $return['gendar'] = $users->gendar;
 
-        return $this->sendResponse($return, 'Users retrieved successfully.');
+        return $this->sendResponse($return, 'Users Info retrieved successfully.');
     }
 
 

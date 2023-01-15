@@ -43,7 +43,7 @@ class SettingsController extends BaseController
 
 
 
-        return $this->sendResponse($this->all_data(), 'All Tables Retrieve successfully.');
+        return $this->sendResponse($this->all_data(), 'All Settings Tables Retrieve successfully.');
     }
 
     /**
@@ -81,7 +81,7 @@ class SettingsController extends BaseController
 
 
 
-        return $this->sendResponse($this->all_data(), 'All Tables Retrieve successfully.');
+        return $this->sendResponse($this->all_data(), 'Settlings tables has been changed successfully.');
     }
 
     /**
@@ -128,6 +128,6 @@ class SettingsController extends BaseController
     {
         //
         DB::table($table)->where('id', '=', $id)->delete();
-        return $this->sendResponse($this->all_data(), "Deleted Successfully");
+        return $this->sendResponse($this->all_data(), "Settings tables values deleted Successfully");
     }
 }

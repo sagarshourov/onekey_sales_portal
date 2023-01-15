@@ -34,7 +34,7 @@ class FileController extends BaseController
                 'doc_type' => $input['type']
 
             ]);
-            return $this->sendResponse($path, 'User file uploaded successfully.');
+            return $this->sendResponse($path, 'Profile picture uploaded successfully.');
         } else {
             $file = new Files;
             $file->title = $input['title'];
@@ -43,6 +43,6 @@ class FileController extends BaseController
             $file->user_id = $user_id;
             $file->save();
         }
-        return $this->sendResponse($this->userfiles(), 'User file uploaded successfully.');
+        return $this->sendResponse($this->userfiles(), 'File uploaded successfully.');
     }
 }

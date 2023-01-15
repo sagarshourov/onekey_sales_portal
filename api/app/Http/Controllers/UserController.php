@@ -17,7 +17,7 @@ class UserController extends BaseController
 
     private function users()
     {
-        $users = User::all();
+        $users = User::with(['profile'])->get();
         return $users;
     }
 
@@ -25,7 +25,7 @@ class UserController extends BaseController
     public function index()
     {
         //
-        return $this->sendResponse($this->users(), 'User retrive successfully.');
+        return $this->sendResponse($this->users(), 'User retrieve successfully.');
     }
 
     /**
@@ -69,7 +69,7 @@ class UserController extends BaseController
 
 
         User::create($input);
-        return $this->sendResponse($this->users(), 'User retrive successfully.');
+        return $this->sendResponse($this->users(), 'New user Add successfully.');
     }
 
     /**
@@ -134,6 +134,6 @@ class UserController extends BaseController
 
         User::find($id)->delete();
 
-        return $this->sendResponse($this->users(), 'Delete Call successfully.');
+        return $this->sendResponse($this->users(), 'User deleted successfully.');
     }
 }

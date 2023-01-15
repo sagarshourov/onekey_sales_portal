@@ -8,8 +8,40 @@ use App\Models\AdminUsers;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
+use Request;
+
+use App\Models\Activity;
+
 class BaseController extends Controller
 {
+
+    public  function addToLog($subject)
+
+    {
+
+
+        $user = Auth::user();
+
+        if ($user->is_admin == 3) {
+
+            $log = [];
+
+            $log['subject'] = $subject;
+
+            $log['url'] = Request::fullUrl();
+
+            $log['method'] = Request::method();
+
+            $log['ip'] = Request::ip();
+
+            $log['agent'] = Request::header('user-agent');
+
+            $log['user_id'] =    $user->id;
+
+            Activity::create($log);
+        }
+    }
+
 
     /**
 
@@ -28,6 +60,8 @@ class BaseController extends Controller
             'data' => $result,
             'message' => $message,
         ];
+
+        $this->addToLog($message);
 
 
         return response()->json($response, 200);
@@ -56,7 +90,29 @@ class BaseController extends Controller
             $response['data'] = $errorMessages;
         }
 
+        //  $this->addToLog($errorMessages);
 
         return response()->json($response, $code);
+    }
+
+
+
+    public function logActivityLists($id)
+
+    {
+
+        $data =  Activity::where('user_id', $id)->orderBy('id', 'DESC')->get();
+
+
+        $response = [
+            'success' => true,
+            'data' => $data,
+            'message' => "Activity log retrieved! ",
+        ];
+
+
+
+
+        return response()->json($response, 200);
     }
 }

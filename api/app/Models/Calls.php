@@ -17,13 +17,13 @@ class Calls extends Model
 
 
     protected $fillable = [
-        'first_name', 'last_name', 'phone_numbr', 'email',  'priority', 'note', 'follow_up_date', 'status', 'package', 'last_contact', 'age', 'gpa', 'last_status_date', 'last_status_notes', 'results', 'cancel_reason', 'feedbacks', 'user_id'
+        'first_name', 'last_name', 'phone_number', 'email',  'priority', 'note', 'follow_up_date', 'status', 'package', 'last_contact', 'age', 'gpa', 'last_status_date', 'last_status_notes', 'results', 'cancel_reason', 'feedbacks', 'user_id'
         ,'memo','f_results','referred_by','first_contact'
     ];
 
     public function extra()
     {
-        return $this->hasMany(CallsExtra::class, 'call_id', 'id')->select();
+        return $this->hasMany(CallsExtra::class, 'call_id', 'id')->orderBy('id', 'DESC');
     }
 
 
@@ -32,7 +32,7 @@ class Calls extends Model
         return $this->hasOne(Results::class, 'id', 'results')->select('id', 'title');
     }
 
-    public function fresults()
+    public function follow_up_call_results()
     {
         return $this->hasOne(Results::class, 'id', 'f_results')->select('id', 'title');
     }

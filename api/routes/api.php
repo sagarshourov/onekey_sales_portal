@@ -39,6 +39,8 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
 
 
     Route::get('events', 'App\Http\Controllers\CallsController@events');
+    
+    Route::get('activity/{id}', 'App\Http\Controllers\BaseController@logActivityLists');
 });
 
 

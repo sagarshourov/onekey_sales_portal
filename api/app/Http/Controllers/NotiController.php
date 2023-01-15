@@ -27,7 +27,7 @@ class NotiController extends BaseController
     public function index()
     {
         //
-        return $this->sendResponse($this->get_noti(), 'Retrive successfully.');
+        return $this->sendResponse($this->get_noti(), 'Notifications Retrieve successfully.');
     }
 
     /**
@@ -62,7 +62,7 @@ class NotiController extends BaseController
         } else {
             Notifications::where('id', (int)  $noti->id)->update(['is_read' => null]);
         }
-        return $this->sendResponse($this->get_noti(), 'Add calls successfully.');
+        return $this->sendResponse($this->get_noti(), 'Notifications Add successfully.');
     }
 
     /**
@@ -103,9 +103,9 @@ class NotiController extends BaseController
 
 
         if ($request->type == 1) {
-            return $this->sendResponse(array('noti' => $this->get_noti(), 'call' => Calls::withTrashed()->where('id', (int)$request->call_id)->first()), 'Update Notifictions successfully.');
+            return $this->sendResponse(array('noti' => $this->get_noti(), 'call' => Calls::withTrashed()->where('id', (int)$request->call_id)->first()), 'Notifications updated  successfully.');
         } else {
-            return $this->sendResponse(array('noti' => $this->get_noti(), 'call' => ''), 'Update Notifictions  successfully.');
+            return $this->sendResponse(array('noti' => $this->get_noti(), 'call' => ''), 'Notifications updated successfully.');
         }
     }
 
@@ -120,6 +120,6 @@ class NotiController extends BaseController
         //
         Notifications::find($id)->forceDelete();
 
-        return $this->sendResponse($this->get_noti(), 'Delete Notification successfully.');
+        return $this->sendResponse($this->get_noti(), 'Notification deleted  successfully.');
     }
 }
