@@ -9,7 +9,8 @@ use App\Models\ExtraValues;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
-
+use Maatwebsite\Excel\Facades\Excel;
+use App\Imports\CallImport;
 class CallsController extends BaseController
 {
     /**
@@ -280,5 +281,14 @@ class CallsController extends BaseController
     public function call_export()
     {
         return $this->sendResponse([], 'call Export successfully.');
+    }
+
+    public function import(Request $request)
+    {
+        Excel::import(
+            new CallImport,
+            $request->file('file')->store('files')
+        );
+        return $this->sendResponse($this->get_calls(), 'File Imported successfully.');
     }
 }

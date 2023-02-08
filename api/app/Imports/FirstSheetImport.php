@@ -36,11 +36,11 @@ class FirstSheetImport implements ToCollection
             }
 
             if(!empty($row[1])){
-                print_r($row[0]);
-              // print_r($row);
-               echo '<br/>';
+            //     print_r($row[0]);
+            //   // print_r($row);
+            //    echo '<br/>';
                
-               echo $this->sections;
+            //    echo $this->sections;
             $in['first_name'] = $row[0];
             $in['last_name']=$row[1];
             $in['phone_number']=$row[2];
@@ -60,17 +60,17 @@ class FirstSheetImport implements ToCollection
             $in['follow_up_notes']=$row[10];
             $in['sections']=$this->sections;
             Calls::create($in);            
-            echo '<br/>';
+           // echo '<br/>';
                 //echo '______END///////////////________';
             }else if(!empty($row[0])){
-                print_r($row[0]);
-                echo '<br/>';
-                print_r($row[1]);
+                // print_r($row[0]);
+                // echo '<br/>';
+                // print_r($row[1]);
                 $this->sections=$this->check($row[0]);
             }
         } 
-        echo '______END///////////////________';
-        echo '<br/>';
+        // echo '______END///////////////________';
+        // echo '<br/>';
     }
     
 }

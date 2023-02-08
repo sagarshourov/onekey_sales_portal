@@ -7,29 +7,34 @@ use Illuminate\Support\Facades\Validator;
 
 use App\Models\User;
 use App\Exports\CallExport;
-use App\Imports\CallImport;
+
 use Maatwebsite\Excel\Facades\Excel;
 
 class UserController extends BaseController
 {
 
-    public function export() 
+    public function export()
     {
         return Excel::download(new CallExport(2023), 'users.xlsx');
+    }
+    // public function import() 
+    // {
+    //     Excel::import(new CallImport, storage_path('users.xlsx'));
+    //     //echo storage_path('users.xlsx');
+    // }
 
-    }
-    public function import() 
-    {
-        Excel::import(new CallImport, storage_path('users.xlsx'));
-        //echo storage_path('users.xlsx');
-    }
+
+   
+
+
+
 
     // public function export() 
     // {
     //     $spreadsheet = new Spreadsheet();
     //     $sheet = $spreadsheet->getActiveSheet();
     //     $sheet->setCellValue('A1', 'Hello World !');
-        
+
     //     // $writer = new Xlsx($spreadsheet);
     //     // $writer->save('hello world.xlsx');
 
