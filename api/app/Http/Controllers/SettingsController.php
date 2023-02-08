@@ -2,13 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ApplyingFor;
 use App\Models\CancelReason;
+use App\Models\Goal;
+use App\Models\MaritalStatus;
 use App\Models\Package;
+use App\Models\PaymentMethod;
 use App\Models\Results;
 use App\Models\Sections;
 use App\Models\Status;
 use App\Models\Priority;
-
+use App\Models\User;
+use App\Models\WantToStudy;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -25,6 +30,22 @@ class SettingsController extends BaseController
         $re['status'] = Status::get(['id', 'title']);
         $re['results'] = Results::get(['id', 'title']);
         $re['priorities'] = Priority::get(['id', 'title']);
+
+        $re['marital_status'] = MaritalStatus::get(['id', 'title']);
+
+        $re['want_to_study'] = WantToStudy::get(['id', 'title']);
+
+        $re['assigned_to'] = User::where('is_admin', 3)->get(['id', 'first_name', 'last_name']);
+
+        $re['applying_for'] = ApplyingFor::get(['id', 'title']);
+
+        $re['goal'] = Goal::get(['id', 'title']);
+
+        $re['payment_method'] = PaymentMethod::get(['id', 'title']);
+
+
+
+
 
         return $re;
     }

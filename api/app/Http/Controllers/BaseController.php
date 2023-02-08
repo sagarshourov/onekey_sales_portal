@@ -22,7 +22,7 @@ class BaseController extends Controller
 
         $user = Auth::user();
 
-        if ($user->is_admin == 3) {
+        if ($user && $user->is_admin == 3) {
 
             $log = [];
 

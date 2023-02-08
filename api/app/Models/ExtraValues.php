@@ -5,17 +5,17 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class CallsExtra extends Model
+class ExtraValues extends Model
 {
 
-    protected $table = 'calls_extra';
+    protected $table = 'extra_values';
     public $timestamps = true;
 
     use SoftDeletes;
 
-  //  protected $dates = ['deleted_at'];
+    protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'id','call_id', 'field', 'value','groups'
+        'id', 'field', 'value', 'ext_id'
     ];
 }
