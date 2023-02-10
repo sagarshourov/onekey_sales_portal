@@ -36,6 +36,7 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
     Route::get('userinfo/{id}', 'App\Http\Controllers\AuthController@userinfo');
     Route::resource('users', UserController::class);
     Route::resource('calls', CallsController::class);
+    Route::put('call_single/{id}', 'App\Http\Controllers\CallsController@call_single');
     Route::post('call_export', 'App\Http\Controllers\CallsController@call_export');
     Route::resource('notifications', NotiController::class);
     Route::resource('settings', SettingsController::class);

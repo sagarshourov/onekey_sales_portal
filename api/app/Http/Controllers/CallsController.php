@@ -147,18 +147,25 @@ class CallsController extends BaseController
 
         if (isset($input['id'])) {
             $id =  $input['id'];
-            $follow = $input['follow_up'];
-            //unset($input['follow_up']);
-            $end = end($follow);
-            $input['follow_up_date'] = $end['follow_up_date'];
-            $input['follow_up_notes'] = $end['follow_up_notes'];
+           
+           
+            if(isset($input['follow_up'])) {
+                $follow = $input['follow_up'];
+                //unset($input['follow_up']);
+                $end = end($follow);
+                $input['follow_up_date'] = $end['follow_up_date'];
+                $input['follow_up_notes'] = $end['follow_up_notes'];
+
+                $this->extra_single($input['follow_up'], 'follow_up',  $id);
+            }  
+
+            isset($input['con_gpa']) &&   $this->extra_single($input['con_gpa'], 'con_gpa',  $id);
+
+
             $data = Calls::updateOrCreate(
                 ['id' =>  (int) $id],
                 $input
             );
-            $this->extra_single($input['follow_up'], 'follow_up',  $id);
-            $this->extra_single($input['con_gpa'], 'con_gpa',  $id);
-
 
             //  $this->extra_insert($input, array('note', 'last_status_notes'));
             return $this->sendResponse($this->get_calls(), 'Call Update successfully.');
@@ -181,8 +188,11 @@ class CallsController extends BaseController
             $end = end($follow);
             $input['follow_up_date'] = $end['follow_up_date'];
             $input['follow_up_notes'] = $end['follow_up_notes'];
-            $this->extra_single($input['follow_up'], 'follow_up', $n->id);
-            $this->extra_single($input['con_gpa'], 'con_gpa',  $n->id);
+          
+          iseet($input['follow_up']) &&  $this->extra_single($input['follow_up'], 'follow_up', $n->id);
+          iseet($input['con_gpa']) &&  $this->extra_single($input['con_gpa'], 'con_gpa',  $n->id);
+
+
             return $this->sendResponse($this->get_calls(), 'Calls add successfully.');
         }
     }
@@ -207,6 +217,14 @@ class CallsController extends BaseController
     public function edit($id)
     {
         //
+    }
+
+
+    public function call_single(Request $request, $id){
+
+
+        $this->extra_single([$request->value], $request->name, $id);
+        return $this->sendResponse($id, 'Update Call successfully.');
     }
 
     /**
@@ -285,10 +303,13 @@ class CallsController extends BaseController
 
     public function import(Request $request)
     {
+
+$file_name = $request->file('file')->getClientOriginalName();
+
         Excel::import(
-            new CallImport,
+            new CallImport($request->user_id,$file_name),
             $request->file('file')->store('files')
         );
-        return $this->sendResponse($this->get_calls(), 'File Imported successfully.');
+        return $this->sendResponse($file_name, 'File Imported successfully.');
     }
 }

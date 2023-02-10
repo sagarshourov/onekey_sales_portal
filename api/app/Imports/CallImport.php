@@ -7,13 +7,27 @@ use Maatwebsite\Excel\Concerns\SkipsUnknownSheets;
 
 class CallImport implements WithMultipleSheets,SkipsUnknownSheets
 { 
+
+
+    private $user_id;
+    private $file_name;
+
+    public function __construct( int $user_id, string $file_name)
+    {
+        $this->user_id = $user_id;
+   
+        $this->file_name = $file_name;
+    }
     /**
      * @return  
      */
     public function sheets(): array
     {
+
+
+        Calls::where('file_name', $this->file_name)->delete();        
         return [
-            'Call' => new FirstSheetImport()
+            'Call' => new FirstSheetImport($this->user_id,$this->file_name)
         ];
         
         // $sections = Sections::all();

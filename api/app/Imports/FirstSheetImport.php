@@ -11,6 +11,18 @@ use App\Models\Sections;
 
 class FirstSheetImport implements ToCollection
 {
+
+
+
+    private $user_id;
+    private $file_name;
+
+    public function __construct( int $user_id, string $file_name)
+    {
+        $this->user_id = $user_id;
+   
+        $this->file_name = $file_name;
+    }
     private $sections=null;
 
     private function check($title){
@@ -59,6 +71,8 @@ class FirstSheetImport implements ToCollection
             $in['age']=$row[9]; //db
             $in['follow_up_notes']=$row[10];
             $in['sections']=$this->sections;
+            $in['user_id']=$this->user_id;
+            $in['file_name']=$this->file_name;
             Calls::create($in);            
            // echo '<br/>';
                 //echo '______END///////////////________';
