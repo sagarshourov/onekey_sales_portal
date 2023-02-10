@@ -28,9 +28,9 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            return Calls::where('user_id', $user->id)->with(['extra.values', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->get();
+            return Calls::where('user_id', $user->id)->with(['extra.values', 'history.user', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->get();
         } else {
-            return Calls::with(['extra.values', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user' => function ($q) {
+            return Calls::with(['extra.values', 'history.user', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user' => function ($q) {
                 $q->orderBy('id', 'DESC');
             }])->get();
         }
@@ -132,10 +132,22 @@ class CallsController extends BaseController
 
     private function extra_single($filed, $value, $user_id, $call_id)
     {
-
         $user = Auth::user();
-        if ($user_id !== $user->id) {
+        if ($user_id == $user->id) {
+        } else {
+            $input['call_id'] = (int) $call_id;
+            $input['field'] = $filed;
+            $input['value'] =  $value;
+            $input['user_id'] =  $user->id;
+            CallsExtra::create($input);
         }
+
+
+        // $input['call_id'] = (int) $call_id;
+        // $input['field'] = $filed;
+        // $input['value'] =  $value . $user_id;
+        // $input['user_id'] =  $user->id;
+        // CallsExtra::create($input);
     }
 
 
@@ -163,10 +175,20 @@ class CallsController extends BaseController
                 $this->extra_group($input['follow_up'], 'follow_up',  $id);
             }
             isset($input['con_gpa']) &&   $this->extra_group($input['con_gpa'], 'con_gpa',  $id);
+            $this->extra_single('feedbacks', $input['feedbacks'], $input['user_id'], $input['id']);
+            unset($input['user_id']);
+
+
             $data = Calls::updateOrCreate(
                 ['id' =>  (int) $id],
                 $input
             );
+
+
+
+
+
+
             //  $this->extra_insert($input, array('note', 'last_status_notes'));
             return $this->sendResponse($this->get_calls(), 'Call Update successfully.');
         } else {

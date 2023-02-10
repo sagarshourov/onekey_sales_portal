@@ -17,13 +17,19 @@ class Calls extends Model
 
 
     protected $fillable = [
-        'first_name', 'last_name', 'phone_number', 'email',  'priority', 'note', 'sections','follow_up_date', 'status', 'package', 'last_contact', 'age', 'gpa', 'last_status_date', 'last_status_notes', 'results', 'cancel_reason', 'feedbacks', 'user_id', 'memo', 'f_results', 'referred_by', 'first_contact', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'confirmed_gpa', 'immigration_filling', 'method_filling', 'goal', 'nationality', 'package_explain', 'agreement_sent', 'agree_date_sent'
+        'first_name', 'last_name', 'phone_number', 'email',  'priority', 'note', 'sections', 'follow_up_date', 'status', 'package', 'last_contact', 'age', 'gpa', 'last_status_date', 'last_status_notes', 'results', 'cancel_reason', 'feedbacks', 'user_id', 'memo', 'f_results', 'referred_by', 'first_contact', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'confirmed_gpa', 'immigration_filling', 'method_filling', 'goal', 'nationality', 'package_explain', 'agreement_sent', 'agree_date_sent'
     ];
 
     public function extra()
     {
         return $this->hasMany(ExtraGroups::class, 'call_id', 'id')->select('id', 'groups', 'call_id');
     }
+
+    public function history()
+    {
+        return $this->hasMany(CallsExtra::class, 'call_id', 'id')->select('id', 'call_id', 'field', 'value', 'created_at', 'user_id');
+    }
+
 
 
     public function results()
@@ -65,7 +71,6 @@ class Calls extends Model
 
     public function user()
     {
-
         return $this->hasOne(User::class, 'id', 'user_id')->select('id', 'first_name', 'last_name', 'team');
     }
     public function section()

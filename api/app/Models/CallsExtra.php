@@ -16,6 +16,12 @@ class CallsExtra extends Model
   //  protected $dates = ['deleted_at'];
 
   protected $fillable = [
-    'id', 'call_id', 'field', 'value', 'groups', 'user_id'
+    'id', 'call_id', 'field', 'value', 'user_id'
   ];
+
+
+  public function user()
+  {
+    return $this->hasOne(User::class, 'id', 'user_id')->select('id', 'first_name', 'last_name');
+  }
 }
