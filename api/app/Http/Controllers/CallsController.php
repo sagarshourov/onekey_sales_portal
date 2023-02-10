@@ -28,7 +28,6 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            return Calls::where('user_id', $user->id)->with(['extra.values', 'history.user', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->get();
         } else {
             return Calls::with(['extra.values', 'history.user', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user' => function ($q) {
                 $q->orderBy('id', 'DESC');
