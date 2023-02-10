@@ -130,6 +130,14 @@ class CallsController extends BaseController
         }
     }
 
+    private function extra_single($filed, $value, $user_id, $call_id)
+    {
+
+        $user = Auth::user();
+        if ($user_id !== $user->id) {
+        }
+    }
+
 
 
 
@@ -142,32 +150,23 @@ class CallsController extends BaseController
     public function store(Request $request)
     {
         //
-
         $input = $request->all();
         // return $this->sendResponse($input, 'Calls add  successfully.');
-
         if (isset($input['id'])) {
             $id =  $input['id'];
-
-
             if (isset($input['follow_up'])) {
                 $follow = $input['follow_up'];
                 //unset($input['follow_up']);
                 $end = end($follow);
                 $input['follow_up_date'] = $end['follow_up_date'];
                 $input['follow_up_notes'] = $end['follow_up_notes'];
-
                 $this->extra_group($input['follow_up'], 'follow_up',  $id);
             }
-
             isset($input['con_gpa']) &&   $this->extra_group($input['con_gpa'], 'con_gpa',  $id);
-
-
             $data = Calls::updateOrCreate(
                 ['id' =>  (int) $id],
                 $input
             );
-
             //  $this->extra_insert($input, array('note', 'last_status_notes'));
             return $this->sendResponse($this->get_calls(), 'Call Update successfully.');
         } else {
@@ -224,28 +223,8 @@ class CallsController extends BaseController
     public function call_single(Request $request, $id)
     {
 
-        $filed =  $request->name;;
-        $value = $request->value;
+        $this->extra_single('name', 'value', 25, 25); // name,value,user_id,call_id
 
-        $call_id = $id;
-        
-        $user_id = $request->user_id;
-
-
-        $user = Auth::user();
-
-
-        if($user_id !== $user->id){
-
-        }
-
-
-
-
-
-
-
-     
         return $this->sendResponse($id, 'Update Call successfully.');
     }
 
