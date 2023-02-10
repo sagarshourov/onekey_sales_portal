@@ -29,13 +29,18 @@ class FirstSheetImport implements ToCollection
 
     private function check($title)
     {
-        $pkg =  Sections::firstOrCreate([
-            'title' => $title
-        ]);
 
-        //$this->sections=$pkg->id;
+        if (preg_match('(Installment|Agreement|Did Not Answer|Promotions|More section)', $title) === 1) {
 
-        return $pkg->id;
+            $pkg =  Sections::firstOrCreate([
+                'title' => $title
+            ]);
+
+            //$this->sections=$pkg->id;
+
+            return $pkg->id;
+        }
+        return null;
     }
 
 
