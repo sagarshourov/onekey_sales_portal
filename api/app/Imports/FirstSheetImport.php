@@ -30,8 +30,13 @@ class FirstSheetImport implements ToCollection
     private function check($title)
     {
 
-        if (preg_match('(Installment|Agreement|Did Not Answer|Promotions|More section)', $title) === 1) {
+        // echo $title;
 
+        // echo '<br/>';
+
+        if (preg_match('(Installment|Agreement|Did|Promotions|Promotion|More section)', $title)) {
+            // echo $title;
+            // echo '<br/>';
             $pkg =  Sections::firstOrCreate([
                 'title' => $title
             ]);
@@ -40,7 +45,7 @@ class FirstSheetImport implements ToCollection
 
             return $pkg->id;
         }
-        return null;
+        return $this->sections;
     }
 
 
@@ -55,11 +60,12 @@ class FirstSheetImport implements ToCollection
             }
 
             if (!empty($row[1])) {
-                //     print_r($row[0]);
-                //   // print_r($row);
-                //    echo '<br/>';
+                // print_r($row[0]);
+                // //   // print_r($row);
+                // echo '<br/>';
 
-                //    echo $this->sections;
+                // echo 'sections : ' . $this->sections;
+                // echo '<br/>';
                 $in['first_name'] = $row[0];
                 $in['last_name'] = $row[1];
                 $in['phone_number'] = $row[2];

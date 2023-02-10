@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\CallImport;
+
 class CallsController extends BaseController
 {
     /**
@@ -105,7 +106,7 @@ class CallsController extends BaseController
     }
 
 
-    private function extra_single($data, $group, $call_id)
+    private function extra_group($data, $group, $call_id)
     {
         if (count($data) == 0) {
             return;
@@ -147,19 +148,19 @@ class CallsController extends BaseController
 
         if (isset($input['id'])) {
             $id =  $input['id'];
-           
-           
-            if(isset($input['follow_up'])) {
+
+
+            if (isset($input['follow_up'])) {
                 $follow = $input['follow_up'];
                 //unset($input['follow_up']);
                 $end = end($follow);
                 $input['follow_up_date'] = $end['follow_up_date'];
                 $input['follow_up_notes'] = $end['follow_up_notes'];
 
-                $this->extra_single($input['follow_up'], 'follow_up',  $id);
-            }  
+                $this->extra_group($input['follow_up'], 'follow_up',  $id);
+            }
 
-            isset($input['con_gpa']) &&   $this->extra_single($input['con_gpa'], 'con_gpa',  $id);
+            isset($input['con_gpa']) &&   $this->extra_group($input['con_gpa'], 'con_gpa',  $id);
 
 
             $data = Calls::updateOrCreate(
@@ -188,9 +189,9 @@ class CallsController extends BaseController
             $end = end($follow);
             $input['follow_up_date'] = $end['follow_up_date'];
             $input['follow_up_notes'] = $end['follow_up_notes'];
-          
-          iseet($input['follow_up']) &&  $this->extra_single($input['follow_up'], 'follow_up', $n->id);
-          iseet($input['con_gpa']) &&  $this->extra_single($input['con_gpa'], 'con_gpa',  $n->id);
+
+            isset($input['follow_up']) &&  $this->extra_group($input['follow_up'], 'follow_up', $n->id);
+            isset($input['con_gpa']) &&  $this->extra_group($input['con_gpa'], 'con_gpa',  $n->id);
 
 
             return $this->sendResponse($this->get_calls(), 'Calls add successfully.');
@@ -220,10 +221,31 @@ class CallsController extends BaseController
     }
 
 
-    public function call_single(Request $request, $id){
+    public function call_single(Request $request, $id)
+    {
+
+        $filed =  $request->name;;
+        $value = $request->value;
+
+        $call_id = $id;
+        
+        $user_id = $request->user_id;
 
 
-        $this->extra_single([$request->value], $request->name, $id);
+        $user = Auth::user();
+
+
+        if($user_id !== $user->id){
+
+        }
+
+
+
+
+
+
+
+     
         return $this->sendResponse($id, 'Update Call successfully.');
     }
 
@@ -304,12 +326,12 @@ class CallsController extends BaseController
     public function import(Request $request)
     {
 
-$file_name = $request->file('file')->getClientOriginalName();
+        $file_name = $request->file('file')->getClientOriginalName();
 
         Excel::import(
-            new CallImport($request->user_id,$file_name),
+            new CallImport($request->user_id, $file_name),
             $request->file('file')->store('files')
         );
-        return $this->sendResponse($file_name, 'File Imported successfully.');
+        // return $this->sendResponse($file_name, 'File Imported successfully.');
     }
 }
