@@ -16,13 +16,17 @@ use Maatwebsite\Excel\Concerns\FromView;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Events\AfterSheet;
 
+use App\Models\Package;
+use App\Models\Sections;
+use App\Models\Status;
+
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
 class InvoicesPerMonthSheet implements  WithTitle,FromView,WithEvents
 {
     private $title;
     private $id;
     protected  $selects;
-    public function __construct(int $id, string $title)
+    public function __construct( $id, string $title)
     {
         $this->id = $id;
         $this->title  = $title;
@@ -42,8 +46,14 @@ class InvoicesPerMonthSheet implements  WithTitle,FromView,WithEvents
 
     public function view(): View
     {
-        return view('invoices', [
-            'invoices' => Calls::with('goal')->where('sections', $this->id)->get()
+        $calls = Calls::where('results', $this->id)->get()->groupBy('sections');
+
+        return view('call_view',[
+            'calls' => $calls,
+            'section' => Sections::all(),
+            'package' => Package::all(),
+            'status' => Status::all(),
+
         ]);
     }
   
@@ -61,21 +71,21 @@ class InvoicesPerMonthSheet implements  WithTitle,FromView,WithEvents
     {
         return [
             // handle by a closure.
-            AfterSheet::class => function(AfterSheet $event) {
-                $validation = $event->sheet->getCell("C3")->getDataValidation();
-                $validation->setType(DataValidation::TYPE_LIST );
-                $validation->setErrorStyle(DataValidation::STYLE_INFORMATION );
-                $validation->setAllowBlank(false);
-                $validation->setShowInputMessage(true);
-                $validation->setShowErrorMessage(true);
-                $validation->setShowDropDown(true);
-                $validation->setErrorTitle('Input error');
-                $validation->setError('Value is not in list.');
-                $validation->setPromptTitle('Pick from list');
-                $validation->setPrompt('Please pick a value from the drop-down list.');
-                $validation->setFormula1(sprintf('"%s"',implode(',',$this->selects)));
+            // AfterSheet::class => function(AfterSheet $event) {
+            //     $validation = $event->sheet->getCell("C3")->getDataValidation();
+            //     $validation->setType(DataValidation::TYPE_LIST );
+            //     $validation->setErrorStyle(DataValidation::STYLE_INFORMATION );
+            //     $validation->setAllowBlank(false);
+            //     $validation->setShowInputMessage(true);
+            //     $validation->setShowErrorMessage(true);
+            //     $validation->setShowDropDown(true);
+            //     $validation->setErrorTitle('Input error');
+            //     $validation->setError('Value is not in list.');
+            //     $validation->setPromptTitle('Pick from list');
+            //     $validation->setPrompt('Please pick a value from the drop-down list.');
+            //     $validation->setFormula1(sprintf('"%s"',implode(',',$this->selects)));
 
-            },
+            // },
         ];
     }
 

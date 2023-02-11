@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\CallsController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -16,6 +17,9 @@ use App\Http\Controllers\UserController;
 Route::get('/', function () {
     return view('welcome');
 });
+
+
+Route::get('/export', [CallsController::class, 'call_export']);
 
 Route::get('users/export/', [UserController::class, 'export']);
 Route::get('users/import/', [UserController::class, 'import']);

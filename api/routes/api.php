@@ -47,7 +47,7 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
     Route::get('token/{id}', 'App\Http\Controllers\AuthController@token');
 
 
-    Route::get('call/export/', [UserController::class, 'export']);
+    Route::get('call/export/', [CallsController::class, 'call_export']);
     Route::post('call/import/', [CallsController::class, 'import']);
 });
 

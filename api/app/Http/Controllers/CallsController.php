@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\CallImport;
+use App\Models\Package;
+use App\Models\Sections;
+use App\Models\Status;
 
 class CallsController extends BaseController
 {
@@ -245,7 +248,7 @@ class CallsController extends BaseController
     public function call_single(Request $request, $id)
     {
 
-       // $this->extra_single('name', 'value', 25, 25); // name,value,user_id,call_id
+        // $this->extra_single('name', 'value', 25, 25); // name,value,user_id,call_id
 
         return $this->sendResponse($id, 'Update Call successfully.');
     }
@@ -321,7 +324,16 @@ class CallsController extends BaseController
 
     public function call_export()
     {
-        return $this->sendResponse([], 'call Export successfully.');
+        $calls = Calls::where('results', null)->get()->groupBy('sections');
+
+        return view('call_view', [
+            'calls' => $calls,
+            'section' => Sections::all(),
+            'package' => Package::all(),
+            'status' => Status::all(),
+
+        ]);
+        return $this->sendResponse($calls, 'call Export successfully.');
     }
 
     public function import(Request $request)

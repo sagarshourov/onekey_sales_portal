@@ -1,6 +1,7 @@
 <?php
 namespace App\Exports;
 use App\Models\Calls;
+use App\Models\Results;
 use App\Models\Sections;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\Exportable;
@@ -31,7 +32,8 @@ class CallExport implements WithMultipleSheets
     public function sheets(): array
     {
         $sheets = [];
-       $sections = Sections::all();
+       $sections = Results::all();
+       $sheets[] = new InvoicesPerMonthSheet(NULL, 'Call');
         foreach($sections as $sec){
             $sheets[] = new InvoicesPerMonthSheet($sec->id, $sec->title);
         }
