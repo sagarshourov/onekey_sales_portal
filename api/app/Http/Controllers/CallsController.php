@@ -28,8 +28,9 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
+            return Calls::where('user_id', $user->id)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->get();
         } else {
-            return Calls::with(['extra.values', 'history.user', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user' => function ($q) {
+            return Calls::with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user' => function ($q) {
                 $q->orderBy('id', 'DESC');
             }])->get();
         }
@@ -244,7 +245,7 @@ class CallsController extends BaseController
     public function call_single(Request $request, $id)
     {
 
-        $this->extra_single('name', 'value', 25, 25); // name,value,user_id,call_id
+       // $this->extra_single('name', 'value', 25, 25); // name,value,user_id,call_id
 
         return $this->sendResponse($id, 'Update Call successfully.');
     }
