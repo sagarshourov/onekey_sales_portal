@@ -45,4 +45,9 @@ class FileController extends BaseController
         }
         return $this->sendResponse($this->userfiles(), 'File uploaded successfully.');
     }
+
+   public function record_upload(Request $request){
+
+    $path = $request->file('file')->store('recorded');
+    }
 }

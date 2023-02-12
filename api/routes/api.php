@@ -28,7 +28,7 @@ Route::post('forgot', 'App\Http\Controllers\AuthController@forgot');
 Route::post('forgot_password', 'App\Http\Controllers\AuthController@forgot_password');
 
 Route::resource('whatsapp', WaController::class);
-
+Route::post('record_upload', 'App\Http\Controllers\FileController@record_upload');
 
 Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"], function () {
     Route::post('file_upload', 'App\Http\Controllers\FileController@file_upload');
