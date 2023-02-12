@@ -27,7 +27,9 @@ class CallImport implements WithMultipleSheets,SkipsUnknownSheets
 
         Calls::where('file_name', $this->file_name)->delete();        
         return [
-            'Call' => new FirstSheetImport($this->user_id,$this->file_name)
+            'Call' => new FirstSheetImport($this->user_id,$this->file_name),
+            'Cancel' => new SingleSheetImport($this->user_id,$this->file_name,1),
+            'Client' => new SingleSheetImport($this->user_id,$this->file_name,2)
         ];
         
         // $sections = Sections::all();

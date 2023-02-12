@@ -18,12 +18,14 @@ class SingleSheetImport implements ToCollection
 
     private $user_id;
     private $file_name;
+    private $result;
 
-    public function __construct(int $user_id, string $file_name)
+    public function __construct(int $user_id, string $file_name,int $result)
     {
         $this->user_id = $user_id;
 
         $this->file_name = $file_name;
+        $this->result = $result;
     }
     private $sections = null;
 
@@ -86,6 +88,7 @@ class SingleSheetImport implements ToCollection
                 $in['sections'] = $this->sections;
                 $in['user_id'] = $this->user_id;
                 $in['file_name'] = $this->file_name;
+                $in['results'] = $this->result;
                 Calls::create($in);
                 // echo '<br/>';
                 //echo '______END///////////////________';
