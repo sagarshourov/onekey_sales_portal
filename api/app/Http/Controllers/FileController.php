@@ -46,8 +46,23 @@ class FileController extends BaseController
         return $this->sendResponse($this->userfiles(), 'File uploaded successfully.');
     }
 
-   public function record_upload(Request $request){
+    public function record_upload(Request $request)
+    {
 
-    $path = $request->file('file')->store('recorded');
+        $path = $request->file('file')->store('recorded');
+        $input = $request->all();
+
+        $file = new Files;
+        $file->title = $input['id'];
+        $file->file_path = $path;
+        $file->doc_type = 6;
+        $file->user_id = $input['user_id'];
+        $file->save();
+    }
+    public function record_history($id)
+    {
+
+        $files = Files::where('title', $id)->get();
+        return $this->sendResponse($files, 'WhatsApp Record retrieve successfully.');
     }
 }

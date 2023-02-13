@@ -46,6 +46,10 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
 
     Route::get('token/{id}', 'App\Http\Controllers\AuthController@token');
 
+    Route::get('whatsapp/record_history/{id}', 'App\Http\Controllers\FileController@record_history');
+
+    
+
 
    
     Route::post('call/import/', [CallsController::class, 'import']);
