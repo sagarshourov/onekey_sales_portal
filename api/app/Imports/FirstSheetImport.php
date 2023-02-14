@@ -85,6 +85,10 @@ class FirstSheetImport implements ToCollection
                 $in['follow_up_notes'] = $row[10];
                 $in['sections'] = $this->sections;
                 $in['user_id'] = $this->user_id;
+
+                $in['assigned_to'] = $this->user_id;
+
+                
                 $in['file_name'] = $this->file_name;
                 Calls::create($in);
                 // echo '<br/>';

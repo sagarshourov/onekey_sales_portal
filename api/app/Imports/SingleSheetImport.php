@@ -89,6 +89,8 @@ class SingleSheetImport implements ToCollection
                 $in['user_id'] = $this->user_id;
                 $in['file_name'] = $this->file_name;
                 $in['results'] = $this->result;
+
+                $in['assigned_to'] = $this->user_id;
                 Calls::create($in);
                 // echo '<br/>';
                 //echo '______END///////////////________';
