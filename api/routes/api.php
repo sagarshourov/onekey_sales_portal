@@ -55,7 +55,7 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
     Route::post('call/import/', [CallsController::class, 'import']);
 });
 
-
+Route::get('whatsapp/record_history/{id}', 'App\Http\Controllers\FileController@record_history');
 Route::get('call/export/', [UserController::class, 'export']);
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
