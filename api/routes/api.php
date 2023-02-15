@@ -52,7 +52,10 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
 
 
    
-    Route::post('call/import/', [CallsController::class, 'import']);
+    Route::post('call/import', [CallsController::class, 'import']);
+
+    Route::post('call/import_file', [CallsController::class, 'import_file']);
+    
 });
 
 Route::get('whatsapp/record_history/{id}', 'App\Http\Controllers\FileController@record_history');

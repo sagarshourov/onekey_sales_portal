@@ -17,6 +17,26 @@ use App\Models\Status;
 
 class CallsController extends BaseController
 {
+
+
+    private function clean($string) {
+
+       $a =  explode('-',$string);
+
+       if(isset($a[0])){
+        $strig = str_replace(' ', '-', $a[0]); // Replaces all spaces with hyphens.
+     
+        return preg_replace('/[^A-Za-z0-9\-]/', '', $strig); // Removes special chars.
+
+
+    }else{
+
+        return preg_replace('/[^A-Za-z0-9\-]/', '', $strig); // Removes special chars. 
+    }
+
+
+       
+     }
     /**
      * Display a listing of the resource.
      *
@@ -336,15 +356,32 @@ class CallsController extends BaseController
         return $this->sendResponse($calls, 'call Export successfully.');
     }
 
+    public function import_file(Request $request)
+    {
+        $file_name = $request->file('file')->getClientOriginalName();
+      $file =  $request->file('file')->store('files');
+
+        return $this->sendResponse(array($file,$file_name), 'File Imported successfully.');
+    }
+
+
     public function import(Request $request)
     {
 
-        $file_name = $request->file('file')->getClientOriginalName();
+        if($request->user_id !== 0){
+
+        $file_name = $this->clean($request->file_name);
 
         Excel::import(
             new CallImport($request->user_id, $file_name),
-            $request->file('file')->store('files')
+            $request->file_path
         );
-        // return $this->sendResponse($file_name, 'File Imported successfully.');
+
+
+        return $this->sendResponse([], 'File Imported successfully.');
+    }
+
+        
+    
     }
 }

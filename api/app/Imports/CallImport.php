@@ -25,7 +25,7 @@ class CallImport implements WithMultipleSheets,SkipsUnknownSheets
     {
 
 
-        Calls::where('file_name', $this->file_name)->delete();        
+        Calls::where('file_name', $this->file_name)->forceDelete();        
         return [
             'Call' => new FirstSheetImport($this->user_id,$this->file_name),
             'Cancel' => new SingleSheetImport($this->user_id,$this->file_name,1),
@@ -45,6 +45,6 @@ class CallImport implements WithMultipleSheets,SkipsUnknownSheets
     public function onUnknownSheet($sheetName)
     {
         // E.g. you can log that a sheet was not found.
-        echo("Sheet {$sheetName} was skipped");
+       // echo("Sheet {$sheetName} was skipped");
     }
 }

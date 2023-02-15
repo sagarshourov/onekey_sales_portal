@@ -55,7 +55,7 @@ class SingleSheetImport implements ToCollection
     {
         //         $package = Package::get()->pluck('title')->toArray();
         // print_r($package);
-echo  $this->file_name;
+//echo  $this->file_name;
         foreach ($rows as $row) {
             if ($row[0] == 'First Name') {
                 continue;
