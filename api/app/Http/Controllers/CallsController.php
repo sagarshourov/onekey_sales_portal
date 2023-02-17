@@ -31,7 +31,7 @@ class CallsController extends BaseController
 
     }else{
 
-        return preg_replace('/[^A-Za-z0-9\-]/', '', $strig); // Removes special chars. 
+        return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars. 
     }
 
 
@@ -359,7 +359,7 @@ class CallsController extends BaseController
     public function import_file(Request $request)
     {
         $file_name = $request->file('file')->getClientOriginalName();
-      $file =  $request->file('file')->store('files');
+        $file =  $request->file('file')->store('files');
 
         return $this->sendResponse(array($file,$file_name), 'File Imported successfully.');
     }
@@ -374,7 +374,7 @@ class CallsController extends BaseController
 
         Excel::import(
             new CallImport($request->user_id, $file_name),
-            $request->file_path
+            $request->file_path 
         );
 
 
