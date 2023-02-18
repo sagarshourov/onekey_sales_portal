@@ -15,28 +15,28 @@ use App\Models\Package;
 use App\Models\Sections;
 use App\Models\Status;
 
+use Illuminate\Support\Facades\Http;
+
 class CallsController extends BaseController
 {
 
 
-    private function clean($string) {
+    private function clean($string)
+    {
 
-       $a =  explode('-',$string);
+        $a =  explode('-', $string);
 
-       if(isset($a[0])){
-        $strig = str_replace(' ', '-', $a[0]); // Replaces all spaces with hyphens.
-     
-        return preg_replace('/[^A-Za-z0-9\-]/', '', $strig); // Removes special chars.
+        if (isset($a[0])) {
+            $strig = str_replace(' ', '-', $a[0]); // Replaces all spaces with hyphens.
+
+            return preg_replace('/[^A-Za-z0-9\-]/', '', $strig); // Removes special chars.
 
 
-    }else{
+        } else {
 
-        return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars. 
+            return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars. 
+        }
     }
-
-
-       
-     }
     /**
      * Display a listing of the resource.
      *
@@ -51,14 +51,32 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            return Calls::where('user_id', $user->id)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->get();
+            return Calls::where(['user_id' => $user->id, 'results' => 3])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->get();
         } else {
-            return Calls::with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user' => function ($q) {
+            return Calls::where('results', 3)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user' => function ($q) {
                 $q->orderBy('id', 'DESC');
             }])->get();
         }
     }
 
+
+
+
+    public function filter($field, $value)
+    {
+        
+        $user = Auth::user();
+
+        //   return   $user;
+
+        if ($user->is_admin == 3) {
+            return Calls::where(['user_id' => $user->id, $field => $value])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->get();
+        } else {
+            return Calls::where($field, $value)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user' => function ($q) {
+                $q->orderBy('id', 'DESC');
+            }])->get();
+        }
+    }
 
 
 
@@ -280,10 +298,36 @@ class CallsController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
+
+
+    public function register_api($data = array())
+    {
+
+
+        $endpoint = "https://api.onekeyclient.us/api/register_api";
+
+
+        $response = Http::post($endpoint, $data);
+
+
+
+
+        return   $data;
+    }
+
+
+
     public function update(Request $request, $id)
     {
+
+
         if ($id == 0) {
             Calls::whereIn('id', $request->ids)->update([$request->name => $request->value]);
+            if ($request->name == 'results' && $request->value == '2') {
+                //  $this->register_api(Calls::whereIn('id', $request->ids)->get());
+
+                return $this->sendResponse($this->register_api(Calls::whereIn('id', $request->ids)->select('first_name', 'last_name', 'email', 'phone_number')->get()), 'Send bulk Api successfully.');
+            }
             return $this->sendResponse($this->get_calls(), 'Bulk Update Call successfully.');
         } else {
             $call = Calls::find($id);
@@ -298,6 +342,12 @@ class CallsController extends BaseController
             } else {
                 Calls::withTrashed()->where('id', (int)  $id)
                     ->update([$request->name => $request->value]);
+            }
+
+            if ($request->name == 'results' && $request->value == '2') {
+                //  $this->register_api(Calls::whereIn('id', $request->ids)->get());
+
+                return $this->sendResponse($this->register_api(Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number')->get()), 'Send Api successfully.');
             }
 
             return $this->sendResponse($this->get_calls(), 'Update Call successfully.');
@@ -361,27 +411,24 @@ class CallsController extends BaseController
         $file_name = $request->file('file')->getClientOriginalName();
         $file =  $request->file('file')->store('files');
 
-        return $this->sendResponse(array($file,$file_name), 'File Imported successfully.');
+        return $this->sendResponse(array($file, $file_name), 'File Imported successfully.');
     }
 
 
     public function import(Request $request)
     {
 
-        if($request->user_id !== 0){
+        if ($request->user_id !== 0) {
 
-        $file_name = $this->clean($request->file_name);
+            $file_name = $this->clean($request->file_name);
 
-        Excel::import(
-            new CallImport($request->user_id, $file_name),
-            $request->file_path 
-        );
+            Excel::import(
+                new CallImport($request->user_id, $file_name),
+                $request->file_path
+            );
 
 
-        return $this->sendResponse([], 'File Imported successfully.');
-    }
-
-        
-    
+            return $this->sendResponse([], 'File Imported successfully.');
+        }
     }
 }

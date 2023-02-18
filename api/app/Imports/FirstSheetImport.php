@@ -59,7 +59,7 @@ class FirstSheetImport implements ToCollection
                 continue;
             }
 
-            if (!empty($row[1])) {
+            if (!empty($row[2])) {
                 // print_r($row[0]);
                 // //   // print_r($row);
                 // echo '<br/>';
@@ -69,7 +69,7 @@ class FirstSheetImport implements ToCollection
                 $in['first_name'] = $row[0];
                 $in['last_name'] = $row[1];
                 $in['phone_number'] = $row[2];
-                $in['email'] = $row[3];
+                $in['email'] = isset($row[3]) ? $row[3] : '';
 
                 $in['last_status_notes'] = $row[4];
 
@@ -87,8 +87,8 @@ class FirstSheetImport implements ToCollection
                 $in['user_id'] = $this->user_id;
 
                 $in['assigned_to'] = $this->user_id;
+                $in['results'] = 3;
 
-                
                 $in['file_name'] = $this->file_name;
                 Calls::create($in);
                 // echo '<br/>';

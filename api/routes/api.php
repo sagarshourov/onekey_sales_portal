@@ -31,6 +31,7 @@ Route::resource('whatsapp', WaController::class);
 Route::post('record_upload', 'App\Http\Controllers\FileController@record_upload');
 
 Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"], function () {
+    Route::get('call_filter/{results}/{value}', 'App\Http\Controllers\CallsController@filter');
     Route::post('file_upload', 'App\Http\Controllers\FileController@file_upload');
     Route::get('check/{field}/{value}', 'App\Http\Controllers\CallsController@check');
     Route::get('userinfo/{id}', 'App\Http\Controllers\AuthController@userinfo');
@@ -43,23 +44,20 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
     Route::get('settings/{table}/{id}', 'App\Http\Controllers\SettingsController@destroy');
     Route::get('events', 'App\Http\Controllers\CallsController@events');
     Route::get('activity/{id}', 'App\Http\Controllers\BaseController@logActivityLists');
-
     Route::get('token/{id}', 'App\Http\Controllers\AuthController@token');
-
     Route::get('whatsapp/record_history/{id}', 'App\Http\Controllers\FileController@record_history');
-
-    
-
+    Route::post('call/import', [CallsController::class, 'import']);
+    Route::post('call/import_file', [CallsController::class, 'import_file']);
 
    
-    Route::post('call/import', [CallsController::class, 'import']);
-
-    Route::post('call/import_file', [CallsController::class, 'import_file']);
-    
 });
 
 Route::get('whatsapp/record_history/{id}', 'App\Http\Controllers\FileController@record_history');
 Route::get('call/export/', [UserController::class, 'export']);
+
+
+
+Route::post('register_api', [CallsController::class, 'register_api']);
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
