@@ -20,7 +20,7 @@ class SingleSheetImport implements ToCollection
     private $file_name;
     private $result;
 
-    public function __construct(int $user_id, string $file_name,int $result)
+    public function __construct(int $user_id, string $file_name, int $result)
     {
         $this->user_id = $user_id;
 
@@ -55,7 +55,7 @@ class SingleSheetImport implements ToCollection
     {
         //         $package = Package::get()->pluck('title')->toArray();
         // print_r($package);
-//echo  $this->file_name;
+        //echo  $this->file_name;
         foreach ($rows as $row) {
             if ($row[0] == 'First Name') {
                 continue;
@@ -89,7 +89,7 @@ class SingleSheetImport implements ToCollection
                 $in['user_id'] = $this->user_id;
                 $in['file_name'] = $this->file_name;
                 $in['results'] = $this->result;
-
+                $in['f_results'] = $this->result;
                 $in['assigned_to'] = $this->user_id;
                 Calls::create($in);
                 // echo '<br/>';

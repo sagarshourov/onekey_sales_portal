@@ -88,6 +88,7 @@ class FirstSheetImport implements ToCollection
 
                 $in['assigned_to'] = $this->user_id;
                 $in['results'] = 3;
+                $in['f_results'] = 3;
 
                 $in['file_name'] = $this->file_name;
                 Calls::create($in);
