@@ -60,11 +60,8 @@ class CallsController extends BaseController
     }
 
 
-
-
-    public function filter($field, $value)
+    private function get_filter_cal($field, $value)
     {
-
         $user = Auth::user();
 
         //   return   $user;
@@ -76,6 +73,17 @@ class CallsController extends BaseController
                 $q->orderBy('id', 'DESC');
             }])->get();
         }
+    }
+
+
+
+
+    public function filter($field, $value)
+    {
+        $filter = $this->get_filter_cal($field, $value);
+
+
+        return $this->sendResponse($filter, 'Retrieve calls.');
     }
 
 
@@ -220,9 +228,15 @@ class CallsController extends BaseController
             unset($input['user_id']);
 
             if ($input['results'] == '4') {
-                unset($input['result']);
+                unset($input['results']);
                 $input['sections'] = 5;
             }
+
+            if ($input['results'] == '3') {
+                $input['sections'] = null;
+            }
+
+
 
 
 
@@ -254,8 +268,12 @@ class CallsController extends BaseController
 
 
             if ($input['results'] == '4') {
-                unset($input['result']);
+                unset($input['results']);
                 $input['sections'] = 5;
+            }
+
+            if ($input['results'] == '3') {
+                $input['sections'] = null;
             }
 
 
@@ -343,6 +361,9 @@ class CallsController extends BaseController
             if ($request->name == 'results' && $request->value == '4') { // when no answer selected its will go no answer section
                 Calls::whereIn('id', $request->ids)
                     ->update(['sections' => 5]);
+            } else  if ($request->name == 'results' && $request->value == '3') { // when no answer selected its will go no answer section
+                Calls::whereIn('id', $request->ids)
+                    ->update(['sections' => null, 'results' => 3]);
             } else {
                 Calls::whereIn('id', $request->ids)->update([$request->name => $request->value]);
             }
@@ -353,7 +374,7 @@ class CallsController extends BaseController
                 //  $this->register_api(Calls::whereIn('id', $request->ids)->get());
 
 
-               $this->register_api(Calls::whereIn('id', $request->ids)->select('first_name', 'last_name', 'email', 'phone_number')->get());
+                $this->register_api(Calls::whereIn('id', $request->ids)->select('first_name', 'last_name', 'email', 'phone_number')->get());
             }
             return $this->sendResponse($this->get_calls(), 'Bulk Update Call successfully.');
         } else {
@@ -366,6 +387,9 @@ class CallsController extends BaseController
             } else if ($request->type == 3) {
                 Calls::withTrashed()->where('id', (int)  $id)
                     ->update([$request->name => $request->value, 'user_id' => $request->user_id]);
+            } else  if ($request->name == 'results' && $request->value == '3') { // when no answer selected its will go no answer section
+                Calls::where('id', (int)  $id)
+                    ->update(['sections' => null, 'results' => 3]);
             } else {
 
                 if ($request->name == 'results' && $request->value == '4') { // when no answer selected its will go no answer section
@@ -381,7 +405,7 @@ class CallsController extends BaseController
             if ($request->name == 'results' && $request->value == '2') {
                 //  $this->register_api(Calls::whereIn('id', $request->ids)->get());
 
-               $this->register_api(Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number')->get());
+                $this->register_api(Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number')->get());
             }
 
             return $this->sendResponse($this->get_calls(), 'Update Call successfully.');
