@@ -51,9 +51,9 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            return Calls::where(['user_id' => $user->id, 'f_results' => 3])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->get();
+            return Calls::where(['user_id' => $user->id, 'results' => 3])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->get();
         } else {
-            return Calls::where('f_results', 3)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user' => function ($q) {
+            return Calls::where('results', 3)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user' => function ($q) {
                 $q->orderBy('id', 'DESC');
             }])->get();
         }
@@ -64,7 +64,7 @@ class CallsController extends BaseController
 
     public function filter($field, $value)
     {
-        
+
         $user = Auth::user();
 
         //   return   $user;
@@ -219,6 +219,13 @@ class CallsController extends BaseController
             $this->extra_single('feedbacks', $input['feedbacks'], $input['user_id'], $input['id']);
             unset($input['user_id']);
 
+            if ($input['results'] == '4') {
+                unset($input['result']);
+                $input['sections'] = 5;
+            }
+
+
+
 
             $data = Calls::updateOrCreate(
                 ['id' =>  (int) $id],
@@ -244,6 +251,15 @@ class CallsController extends BaseController
                 return $this->sendError($validator->errors(), $call);
                 //return $this->sendError('Validation Error.', $validator->errors());
             }
+
+
+            if ($input['results'] == '4') {
+                unset($input['result']);
+                $input['sections'] = 5;
+            }
+
+
+
             $n = Calls::create($input);
             $follow = $input['follow_up'];
             //unset($input['follow_up']);
@@ -321,12 +337,23 @@ class CallsController extends BaseController
     {
 
 
+
+
         if ($id == 0) {
-            Calls::whereIn('id', $request->ids)->update([$request->name => $request->value]);
+            if ($request->name == 'results' && $request->value == '4') { // when no answer selected its will go no answer section
+                Calls::whereIn('id', $request->ids)
+                    ->update(['sections' => 5]);
+            } else {
+                Calls::whereIn('id', $request->ids)->update([$request->name => $request->value]);
+            }
+
+
+
             if ($request->name == 'results' && $request->value == '2') {
                 //  $this->register_api(Calls::whereIn('id', $request->ids)->get());
 
-                return $this->sendResponse($this->register_api(Calls::whereIn('id', $request->ids)->select('first_name', 'last_name', 'email', 'phone_number')->get()), 'Send bulk Api successfully.');
+
+               $this->register_api(Calls::whereIn('id', $request->ids)->select('first_name', 'last_name', 'email', 'phone_number')->get());
             }
             return $this->sendResponse($this->get_calls(), 'Bulk Update Call successfully.');
         } else {
@@ -340,14 +367,21 @@ class CallsController extends BaseController
                 Calls::withTrashed()->where('id', (int)  $id)
                     ->update([$request->name => $request->value, 'user_id' => $request->user_id]);
             } else {
-                Calls::withTrashed()->where('id', (int)  $id)
-                    ->update([$request->name => $request->value]);
+
+                if ($request->name == 'results' && $request->value == '4') { // when no answer selected its will go no answer section
+                    Calls::withTrashed()->where('id', (int)  $id)
+                        ->update(['sections' => 5]);
+                } else {
+                    Calls::withTrashed()->where('id', (int)  $id)
+                        ->update([$request->name => $request->value]);
+                }
             }
+
 
             if ($request->name == 'results' && $request->value == '2') {
                 //  $this->register_api(Calls::whereIn('id', $request->ids)->get());
 
-                return $this->sendResponse($this->register_api(Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number')->get()), 'Send Api successfully.');
+               $this->register_api(Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number')->get());
             }
 
             return $this->sendResponse($this->get_calls(), 'Update Call successfully.');
