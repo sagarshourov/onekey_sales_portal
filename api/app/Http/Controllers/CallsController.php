@@ -125,6 +125,20 @@ class CallsController extends BaseController
         //
     }
 
+    public function register_api($data = array())
+    {
+
+
+        $endpoint = "https://api.onekeyclient.us/api/register_api";
+
+
+        $response = Http::post($endpoint, $data);
+
+
+
+
+        return   $data;
+    }
 
     // private function extra_insert($data, $fields)
     // {
@@ -227,29 +241,19 @@ class CallsController extends BaseController
             $this->extra_single('feedbacks', $input['feedbacks'], $input['user_id'], $input['id']);
             unset($input['user_id']);
 
-            if ($input['results'] == '4') {
-                unset($input['results']);
+            if ($input['results'] == 4) {
+                $input['results']=3;
                 $input['sections'] = 5;
-            }
-
-            if ($input['results'] == '3') {
+            }else if ($input['results'] == 3) {
                 $input['sections'] = null;
+            }else if ($input['results'] == 2) {
+             
+                $this->register_api(Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number')->get());
             }
-
-
-
-
-
-
             $data = Calls::updateOrCreate(
                 ['id' =>  (int) $id],
                 $input
             );
-
-
-
-
-
 
             //  $this->extra_insert($input, array('note', 'last_status_notes'));
             return $this->sendResponse($this->get_calls(), 'Call Update successfully.');
@@ -267,16 +271,15 @@ class CallsController extends BaseController
             }
 
 
-            if ($input['results'] == '4') {
-                unset($input['results']);
+            if ($input['results'] == 4) {
+                $input['results']=3;
                 $input['sections'] = 5;
-            }
-
-            if ($input['results'] == '3') {
+            }else if ($input['results'] == 3) {
                 $input['sections'] = null;
+            }else if ($input['results'] == 2) {
+             
+                $this->register_api(Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number')->get());
             }
-
-
 
             $n = Calls::create($input);
             $follow = $input['follow_up'];
@@ -334,21 +337,7 @@ class CallsController extends BaseController
      */
 
 
-    public function register_api($data = array())
-    {
-
-
-        $endpoint = "https://api.onekeyclient.us/api/register_api";
-
-
-        $response = Http::post($endpoint, $data);
-
-
-
-
-        return   $data;
-    }
-
+  
 
 
     public function update(Request $request, $id)
