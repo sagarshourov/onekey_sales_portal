@@ -5,6 +5,12 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 
 use Carbon\Carbon;
+
+
+use Mail;
+
+
+
 // class DatabaseBackUp extends Command
 // {
 //     /**
@@ -48,7 +54,7 @@ class DatabaseBackUp extends Command
 
     protected $signature = 'database:backup';
 
-  
+
 
     /**
 
@@ -62,7 +68,7 @@ class DatabaseBackUp extends Command
 
     protected $description = 'Command description';
 
-  
+
 
     /**
 
@@ -79,10 +85,8 @@ class DatabaseBackUp extends Command
     {
 
         parent::__construct();
-
     }
 
-  
 
     /**
 
@@ -100,20 +104,19 @@ class DatabaseBackUp extends Command
 
         $filename = "backup-" . Carbon::now()->format('Y-m-d') . ".gz";
 
-  
 
-        $command = "mysqldump --user=" . env('DB_USERNAME') ." --password=" . env('DB_PASSWORD') . " --host=" . env('DB_HOST') . " " . env('DB_DATABASE') . "  | gzip > " . storage_path() . "/app/backup/" . $filename;
+        $file_path = storage_path() . "/app/backup/" . $filename;
 
-  
+        $command = "mysqldump --user=" . env('DB_USERNAME') . " --password=" . env('DB_PASSWORD') . " --host=" . env('DB_HOST') . " " . env('DB_DATABASE') . "  | gzip > " . $file_path;
+
+
 
         $returnVar = NULL;
 
         $output  = NULL;
 
-  
+
 
         exec($command, $output, $returnVar);
-
     }
-
 }

@@ -242,12 +242,12 @@ class CallsController extends BaseController
             unset($input['user_id']);
 
             if ($input['results'] == 4) {
-                $input['results']=3;
+                $input['results'] = 3;
                 $input['sections'] = 5;
-            }else if ($input['results'] == 3) {
+            } else if ($input['results'] == 3) {
                 $input['sections'] = null;
-            }else if ($input['results'] == 2) {
-             
+            } else if ($input['results'] == 2) {
+
                 $this->register_api(Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number')->get());
             }
             $data = Calls::updateOrCreate(
@@ -272,13 +272,10 @@ class CallsController extends BaseController
 
 
             if ($input['results'] == 4) {
-                $input['results']=3;
+                $input['results'] = 3;
                 $input['sections'] = 5;
-            }else if ($input['results'] == 3) {
+            } else if ($input['results'] == 3) {
                 $input['sections'] = null;
-            }else if ($input['results'] == 2) {
-             
-                $this->register_api(Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number')->get());
             }
 
             $n = Calls::create($input);
@@ -291,6 +288,12 @@ class CallsController extends BaseController
 
             isset($input['follow_up']) &&  $this->extra_group($input['follow_up'], 'follow_up', $n->id);
             isset($input['con_gpa']) &&  $this->extra_group($input['con_gpa'], 'con_gpa',  $n->id);
+
+
+            if ($input['results'] == 2) {
+
+                $this->register_api(Calls::where('id',  $n->id)->select('first_name', 'last_name', 'email', 'phone_number')->get());
+            }
 
 
             return $this->sendResponse($this->get_calls(), 'Calls add successfully.');
@@ -337,7 +340,7 @@ class CallsController extends BaseController
      */
 
 
-  
+
 
 
     public function update(Request $request, $id)
