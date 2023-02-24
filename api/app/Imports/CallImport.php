@@ -29,7 +29,7 @@ class CallImport implements WithMultipleSheets,SkipsUnknownSheets
         return [
             'Call' => new FirstSheetImport($this->user_id,$this->file_name),
             'Cancel' => new SingleSheetImport($this->user_id,$this->file_name,1),
-            'Client' => new SingleSheetImport($this->user_id,$this->file_name,2)
+           // 'Client' => new SingleSheetImport($this->user_id,$this->file_name,2)
         ];
         
         // $sections = Sections::all();

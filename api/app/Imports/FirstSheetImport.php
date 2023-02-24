@@ -75,12 +75,12 @@ class FirstSheetImport implements ToCollection
 
                 $in['status'] = Status::firstOrCreate([
                     'title' => $row[5]
-                ])->id;; //db
+                ])->id; //db
                 $in['ag'] = $row[6]; //db
 
-                $in['package'] = Package::firstOrCreate([
+                $in['package'] = $row[7] !== null ? Package::firstOrCreate([
                     'title' => $row[7]
-                ])->id; //db
+                ])->id : 1; //db
                 $in['age'] = $row[9]; //db
                 $in['follow_up_notes'] = $row[10];
                 $in['sections'] = $this->sections;
