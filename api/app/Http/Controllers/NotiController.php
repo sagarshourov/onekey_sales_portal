@@ -103,7 +103,7 @@ class NotiController extends BaseController
 
 
         if ($request->type == 1) {
-            return $this->sendResponse(array('noti' => $this->get_noti(), 'call' => Calls::withTrashed()->where('id', (int)$request->call_id)->first()), 'Notifications updated  successfully.');
+            return $this->sendResponse(array('noti' => $this->get_noti(), 'call' => Calls::withTrashed()->with(['user'])->where('id', (int)$request->call_id)->first()), 'Notifications updated  successfully.');
         } else {
             return $this->sendResponse(array('noti' => $this->get_noti(), 'call' => ''), 'Notifications updated successfully.');
         }
