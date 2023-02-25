@@ -238,6 +238,9 @@ class CallsController extends BaseController
                 $this->extra_group($input['follow_up'], 'follow_up',  $id);
             }
             isset($input['con_gpa']) &&   $this->extra_group($input['con_gpa'], 'con_gpa',  $id);
+            isset($input['suppose']) &&  $this->extra_group($input['suppose'], 'suppose', $id);
+            isset($input['my_step']) &&  $this->extra_group($input['my_step'], 'my_step',  $id);
+
             $this->extra_single('feedbacks', $input['feedbacks'], $input['user_id'], $input['id']);
             unset($input['user_id']);
 
@@ -289,6 +292,8 @@ class CallsController extends BaseController
             isset($input['follow_up']) &&  $this->extra_group($input['follow_up'], 'follow_up', $n->id);
             isset($input['con_gpa']) &&  $this->extra_group($input['con_gpa'], 'con_gpa',  $n->id);
 
+            isset($input['suppose']) &&  $this->extra_group($input['suppose'], 'suppose', $n->id);
+            isset($input['my_step']) &&  $this->extra_group($input['my_step'], 'my_step',  $n->id);
 
             if ($input['results'] == 2) {
 
