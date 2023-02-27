@@ -197,6 +197,7 @@ class CallsController extends BaseController
     {
         $user = Auth::user();
         if ($user_id == $user->id) {
+
         } else {
             $input['call_id'] = (int) $call_id;
             $input['field'] = $filed;
@@ -337,9 +338,9 @@ class CallsController extends BaseController
     public function call_single(Request $request, $id)
     {
 
-        // $this->extra_single('name', 'value', 25, 25); // name,value,user_id,call_id
+         $this->extra_single($request->nmae, $request->value, $request->user_id, $id); // $filed, $value, $user_id, $call_id)
 
-        return $this->sendResponse($id, 'Update Call successfully.');
+        return $this->sendResponse($this->get_calls(), 'Update Call successfully.');
     }
 
     /**
