@@ -17,7 +17,7 @@ class Calls extends Model
 
 
     protected $fillable = [
-        'first_name', 'last_name', 'phone_number', 'whatsapp','email',  'priority', 'note', 'file_name', 'sections', 'follow_up_date', 'status', 'package', 'last_contact', 'age', 'gpa', 'last_status_date', 'last_status_notes', 'results', 'cancel_reason', 'feedbacks', 'user_id', 'memo', 'f_results', 'referred_by', 'first_contact', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'confirmed_gpa', 'immigration_filling', 'method_filling', 'goal', 'nationality', 'package_explain', 'agreement_sent', 'agree_date_sent'
+        'first_name', 'last_name', 'phone_number', 'whatsapp','email',  'priority', 'note', 'file_name', 'sections', 'follow_up_date', 'status', 'package', 'last_contact', 'age', 'gpa', 'last_status_date', 'last_status_notes', 'results', 'cancel_reason', 'feedbacks', 'user_id', 'memo', 'f_results', 'referred_by', 'first_contact', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'confirmed_gpa', 'immigration_filling', 'method_filling', 'goal', 'nationality', 'package_explain', 'agreement_sent', 'agree_date_sent','degree','field_study','call_schedule_date','call_schedule_time','eng_test','eng_test_score','next_step','payment_method','agreed_to_pay','agreed_to_signed','agreement_signed_date','cancel_note','first_call_notes'
     ];
 
     public function extra()
@@ -82,7 +82,7 @@ class Calls extends Model
     public function marital_status()
     {
 
-        return $this->hasOne(Sections::class, 'id', 'marital_status')->select('id', 'title');
+        return $this->hasOne(MaritalStatus::class, 'id', 'marital_status')->select('id', 'title');
     }
 
     public function applying_for()
@@ -92,18 +92,15 @@ class Calls extends Model
     }
     public function want_to_study()
     {
-
         return $this->hasOne(WantToStudy::class, 'id', 'want_to_study')->select('id', 'title');
     }
 
     public function assigned_to()
     {
-
         return $this->hasOne(User::class, 'id', 'assigned_to')->select('id', 'first_name', 'last_name', 'team');
     }
     public function goal()
     {
-
         return $this->hasOne(Goal::class, 'id', 'goal')->select('id', 'title');
     }
 }

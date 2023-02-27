@@ -226,7 +226,7 @@ class CallsController extends BaseController
     {
         //
         $input = $request->all();
-        // return $this->sendResponse($input, 'Calls add  successfully.');
+       // return $this->sendResponse($input, 'Calls add  successfully.');
         if (isset($input['id'])) {
             $id =  $input['id'];
             if (isset($input['follow_up'])) {
@@ -237,7 +237,8 @@ class CallsController extends BaseController
                 $input['follow_up_notes'] = $end['follow_up_notes'];
                 $this->extra_group($input['follow_up'], 'follow_up',  $id);
             }
-            isset($input['con_gpa']) &&   $this->extra_group($input['con_gpa'], 'con_gpa',  $id);
+            isset($input['con_gpa']) &&  $this->extra_group($input['con_gpa'], 'con_gpa',  $id);
+
             isset($input['suppose']) &&  $this->extra_group($input['suppose'], 'suppose', $id);
             isset($input['my_step']) &&  $this->extra_group($input['my_step'], 'my_step',  $id);
 
@@ -314,6 +315,11 @@ class CallsController extends BaseController
     public function show($id)
     {
         //
+       $call =  Calls::where('id', $id)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->first();
+
+       return $this->sendResponse( $call, 'Single Call retrive successfully.');
+       
+
     }
 
     /**
