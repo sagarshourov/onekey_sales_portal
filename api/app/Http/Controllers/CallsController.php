@@ -338,7 +338,12 @@ class CallsController extends BaseController
     public function call_single(Request $request, $id)
     {
 
-         $this->extra_single($request->nmae, $request->value, $request->user_id, $id); // $filed, $value, $user_id, $call_id)
+        $data = Calls::updateOrCreate(
+            ['id' =>  (int) $id],
+           [$request->name => $request->value]
+        );
+
+         $this->extra_single($request->name, $request->value, $request->user_id, $id); // $filed, $value, $user_id, $call_id)
 
         return $this->sendResponse($this->get_calls(), 'Update Call successfully.');
     }
