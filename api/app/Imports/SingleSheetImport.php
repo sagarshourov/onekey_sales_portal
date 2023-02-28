@@ -79,10 +79,14 @@ class SingleSheetImport implements ToCollection
                     'title' => $row[5]
                 ])->id;; //db
                 $in['ag'] = $row[6]; //db
-
-                $in['package'] = $row[7] !== null ? Package::firstOrCreate([
-                    'title' => $row[7]
-                ])->id : 1; //db
+                if ($this->result !== 1) {
+                    $in['package'] =      $row[7] !== null ? Package::firstOrCreate([
+                        'title' => $row[7]
+                    ])->id : 1;
+                } else {
+                    $in['package'] = null;
+                }
+                //db
                 $in['age'] = $row[9]; //db
                 $in['follow_up_notes'] = $row[10];
                 $in['sections'] = $this->sections;

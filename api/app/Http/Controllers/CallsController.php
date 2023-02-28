@@ -51,7 +51,7 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            return Calls::where(['user_id' => $user->id, 'results' => 3])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->get();
+            return Calls::where(['assigned_to' => $user->id, 'results' => 3])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->get();
         } else {
             return Calls::where('results', 3)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user' => function ($q) {
                 $q->orderBy('id', 'DESC');
@@ -67,7 +67,7 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            return Calls::where(['user_id' => $user->id, $field => $value])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->get();
+            return Calls::where(['assigned_to' => $user->id, $field => $value])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->get();
         } else {
             return Calls::where($field, $value)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user' => function ($q) {
                 $q->orderBy('id', 'DESC');
@@ -338,12 +338,22 @@ class CallsController extends BaseController
     public function call_single(Request $request, $id)
     {
 
+        $call = Calls::find($id);
+
+        $this->extra_single($request->name, $call->{$request->name}, $request->user_id, $id);
+
+
+        $call->{$request->name} = $request->value;
+
+        $call->save();
+
+
         $data = Calls::updateOrCreate(
             ['id' =>  (int) $id],
            [$request->name => $request->value]
         );
 
-         $this->extra_single($request->name, $request->value, $request->user_id, $id); // $filed, $value, $user_id, $call_id)
+         // $filed, $value, $user_id, $call_id)
 
         return $this->sendResponse($this->get_calls(), 'Update Call successfully.');
     }
@@ -395,7 +405,7 @@ class CallsController extends BaseController
                 CallsExtra::create($input);
             } else if ($request->type == 3) {
                 Calls::withTrashed()->where('id', (int)  $id)
-                    ->update([$request->name => $request->value, 'user_id' => $request->user_id]);
+                    ->update([$request->name => $request->value, 'assigned_to' => $request->user_id]);
             } else  if ($request->name == 'results' && $request->value == '3') { // when no answer selected its will go no answer section
                 Calls::where('id', (int)  $id)
                     ->update(['sections' => null, 'results' => 3]);
