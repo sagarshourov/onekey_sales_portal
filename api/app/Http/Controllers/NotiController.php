@@ -52,15 +52,15 @@ class NotiController extends BaseController
 
 
         $noti = Notifications::where(['call_id' => $request->call_id, 'type' => $request->type])->first();
-
+        $user = Auth::user();
         //return $this->sendResponse($noti, 'Add calls successfully.');
         if ($noti == null || $noti->count() == 0) {
-            $user = Auth::user();
+
             $input = $request->all();
-            $input['user_id'] =  $user->id;
+            $input['user_id'] =  $request->user_id;
             Notifications::create($input);
         } else {
-            Notifications::where('id', (int)  $noti->id)->update(['is_read' => null]);
+            Notifications::where('id', (int)  $noti->id)->update(['is_read' => null, 'user_id' => $request->user_id]);
         }
         return $this->sendResponse($this->get_noti(), 'Notifications Add successfully.');
     }

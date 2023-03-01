@@ -197,7 +197,6 @@ class CallsController extends BaseController
     {
         $user = Auth::user();
         if ($user_id == $user->id) {
-
         } else {
             $input['call_id'] = (int) $call_id;
             $input['field'] = $filed;
@@ -227,7 +226,7 @@ class CallsController extends BaseController
     {
         //
         $input = $request->all();
-       // return $this->sendResponse($input, 'Calls add  successfully.');
+        // return $this->sendResponse($input, 'Calls add  successfully.');
         if (isset($input['id'])) {
             $id =  $input['id'];
             if (isset($input['follow_up'])) {
@@ -316,11 +315,9 @@ class CallsController extends BaseController
     public function show($id)
     {
         //
-       $call =  Calls::where('id', $id)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->first();
+        $call =  Calls::where('id', $id)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->first();
 
-       return $this->sendResponse( $call, 'Single Call retrive successfully.');
-       
-
+        return $this->sendResponse($call, 'Single Call retrive successfully.');
     }
 
     /**
@@ -350,10 +347,10 @@ class CallsController extends BaseController
 
         $data = Calls::updateOrCreate(
             ['id' =>  (int) $id],
-           [$request->name => $request->value]
+            [$request->name => $request->value]
         );
 
-         // $filed, $value, $user_id, $call_id)
+        // $filed, $value, $user_id, $call_id)
 
         return $this->sendResponse($this->get_calls(), 'Update Call successfully.');
     }
@@ -405,7 +402,7 @@ class CallsController extends BaseController
                 CallsExtra::create($input);
             } else if ($request->type == 3) {
                 Calls::withTrashed()->where('id', (int)  $id)
-                    ->update([$request->name => $request->value, 'assigned_to' => $request->user_id]);
+                    ->update([$request->name => $request->value, 'assigned_to' => $request->user_id, 'assigned_date' => date("Y-m-d H:i:s")]);
             } else  if ($request->name == 'results' && $request->value == '3') { // when no answer selected its will go no answer section
                 Calls::where('id', (int)  $id)
                     ->update(['sections' => null, 'results' => 3]);
