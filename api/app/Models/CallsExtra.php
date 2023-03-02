@@ -22,6 +22,6 @@ class CallsExtra extends Model
 
   public function user()
   {
-    return $this->hasOne(User::class, 'id', 'user_id')->select('id', 'first_name', 'last_name');
+    return $this->hasOne(User::class, 'id', 'user_id')->select('id', 'first_name', 'last_name','is_admin');
   }
 }

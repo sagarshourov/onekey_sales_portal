@@ -17,7 +17,7 @@ class Calls extends Model
 
 
     protected $fillable = [
-        'first_name', 'last_name', 'phone_number', 'whatsapp','email',  'priority', 'note', 'file_name', 'sections', 'follow_up_date', 'status', 'package', 'last_contact', 'age', 'gpa', 'last_status_date', 'last_status_notes', 'results', 'cancel_reason', 'feedbacks', 'user_id', 'memo', 'f_results', 'referred_by', 'first_contact', 'marital_status', 'want_to_study', 'assigned_to','assigned_date','applying_for', 'confirmed_gpa', 'immigration_filling', 'method_filling', 'goal', 'nationality', 'package_explain', 'agreement_sent', 'agree_date_sent','degree','field_study','call_schedule_date','call_schedule_time','eng_test','eng_test_score','next_step','payment_method','agreed_to_pay','agreed_to_signed','agreement_signed_date','cancel_note','first_call_notes'
+        'first_name', 'last_name', 'phone_number', 'whatsapp','email',  'priority', 'note', 'file_name', 'sections', 'follow_up_date', 'status', 'package', 'last_contact', 'age', 'gpa', 'last_status_date', 'last_status_notes', 'results', 'cancel_reason', 'feedbacks', 'user_id', 'memo', 'f_results', 'referred_by', 'first_contact', 'marital_status', 'want_to_study', 'assigned_to','assigned_date','applying_for', 'confirmed_gpa', 'immigration_filling', 'method_filling', 'goal', 'nationality', 'package_explain', 'agreement_sent', 'agree_date_sent','degree','field_study','call_schedule_date','call_schedule_time','eng_test','eng_test_score','next_step','payment_method','agreed_to_pay','agreed_to_signed','agreement_signed_date','cancel_note','first_call_notes','case_type'
     ];
 
     public function extra()

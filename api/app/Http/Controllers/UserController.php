@@ -24,7 +24,7 @@ class UserController extends BaseController
     // }
 
 
-   
+
 
 
 
@@ -141,20 +141,16 @@ class UserController extends BaseController
         //
 
         $input = $request->all();
-
         if (isset($input['password'])) {
             $input['password'] = bcrypt($input['password']);
         }
-
-
         User::updateOrCreate(
             [
                 'id'   => $input['id'],
             ],
             $input
-
         );
-        return $this->sendResponse($input, 'User Info Updated successfully.');
+        return $this->sendResponse($this->users(), 'User Info Updated successfully.');
     }
 
     /**

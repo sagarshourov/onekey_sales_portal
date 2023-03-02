@@ -193,15 +193,15 @@ class CallsController extends BaseController
         }
     }
 
-    private function extra_single($filed, $value, $user_id, $call_id)
+    private function extra_single($filed, $value, $user_id, $call_id, $call_user_id)
     {
         $user = Auth::user();
-        if ($user_id == $user->id) {
+        if ($call_user_id == $user->id) {
         } else {
             $input['call_id'] = (int) $call_id;
             $input['field'] = $filed;
             $input['value'] =  $value;
-            $input['user_id'] =  $user->id;
+            $input['user_id'] = (int) $user_id;
             CallsExtra::create($input);
         }
 
@@ -233,7 +233,7 @@ class CallsController extends BaseController
                 $follow = $input['follow_up'];
                 //unset($input['follow_up']);
                 $end = end($follow);
-                $input['follow_up_date'] = $end['follow_up_date'];
+                // $input['follow_up_date'] = $end['follow_up_date'];
                 $input['follow_up_notes'] = $end['follow_up_notes'];
                 $this->extra_group($input['follow_up'], 'follow_up',  $id);
             }
@@ -242,7 +242,7 @@ class CallsController extends BaseController
             isset($input['suppose']) &&  $this->extra_group($input['suppose'], 'suppose', $id);
             isset($input['my_step']) &&  $this->extra_group($input['my_step'], 'my_step',  $id);
 
-            $this->extra_single('feedbacks', $input['feedbacks'], $input['user_id'], $input['id']);
+            $this->extra_single('feedbacks', $input['feedbacks'], $input['user_id'], $input['id'], $input['assigned_to']);
             unset($input['user_id']);
 
             if ($input['results'] == 4) {
@@ -287,7 +287,7 @@ class CallsController extends BaseController
             //unset($input['follow_up']);
 
             $end = end($follow);
-            $input['follow_up_date'] = $end['follow_up_date'];
+            // $input['follow_up_date'] = $end['follow_up_date'];
             $input['follow_up_notes'] = $end['follow_up_notes'];
 
             isset($input['follow_up']) &&  $this->extra_group($input['follow_up'], 'follow_up', $n->id);
@@ -337,7 +337,7 @@ class CallsController extends BaseController
 
         $call = Calls::find($id);
 
-        $this->extra_single($request->name, $call->{$request->name}, $request->user_id, $id);
+        $this->extra_single($request->name, $call->{$request->name}, $request->user_id, $id, $call->assigned_to);
 
 
         $call->{$request->name} = $request->value;
