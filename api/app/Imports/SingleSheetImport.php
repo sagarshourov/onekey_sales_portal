@@ -36,7 +36,7 @@ class SingleSheetImport implements ToCollection
 
         // echo '<br/>';
 
-        if (preg_match('(Installment|Agreement|Did|Promotions|Promotion|More section)', $title)) {
+        if (preg_match('(Installment|Agreement|Signed|Did|Promotions|Promotion|More section)', $title)) {
             // echo $title;
             // echo '<br/>';
             $pkg =  Sections::firstOrCreate([
@@ -46,6 +46,8 @@ class SingleSheetImport implements ToCollection
             //$this->sections=$pkg->id;
 
             return $pkg->id;
+        } else  if (preg_match('(Non Section)', $title)) {
+            return null;
         }
         return $this->sections;
     }
@@ -78,7 +80,7 @@ class SingleSheetImport implements ToCollection
                 $in['status'] = Status::firstOrCreate([
                     'title' => $row[5]
                 ])->id;; //db
-                $in['ag'] = $row[6]; //db
+                $in['ag'] = $row[6] == 'TRUE' ? 1 : 0; //db
                 if ($this->result !== 1) {
                     $in['package'] =      $row[7] !== null ? Package::firstOrCreate([
                         'title' => $row[7]
