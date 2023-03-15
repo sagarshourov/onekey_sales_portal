@@ -51,9 +51,9 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            return Calls::where(['assigned_to' => $user->id, 'results' => 3])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->orderBy('id','desc')->get();
+            return Calls::where(['assigned_to' => $user->id, 'results' => 3])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->get();
         } else {
-            return Calls::where('results', 3)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->orderBy('id','desc')->get();
+            return Calls::where('results', 3)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->get();
         }
     }
 
@@ -65,9 +65,9 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            return Calls::where(['assigned_to' => $user->id, $field => $value])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->orderBy('id','desc')->get();
+            return Calls::where(['assigned_to' => $user->id, $field => $value])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->get();
         } else {
-            return Calls::where($field, $value)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->orderBy('id','desc')->get();
+            return Calls::where($field, $value)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->get();
         }
     }
 
@@ -244,9 +244,11 @@ class CallsController extends BaseController
             if ($input['results'] == 4) {
                 $input['results'] = 3;
                 $input['sections'] = 5;
-            } else if ($input['results'] == 3) {
-                $input['sections'] = null;
-            } else if ($input['results'] == 2) {
+            }
+            // else if ($input['results'] == 3) {
+            //     $input['sections'] = null;
+            // } 
+            else if ($input['results'] == 2) {
 
                 $this->register_api(Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number')->get());
             }
@@ -274,9 +276,11 @@ class CallsController extends BaseController
             if ($input['results'] == 4) {
                 $input['results'] = 3;
                 $input['sections'] = 5;
-            } else if ($input['results'] == 3) {
-                $input['sections'] = null;
             }
+
+            // else if ($input['results'] == 3) {
+            //     $input['sections'] = null;
+            // }
 
             $n = Calls::create($input);
             $follow = $input['follow_up'];
@@ -449,16 +453,29 @@ class CallsController extends BaseController
     {
         $user = Auth::user();
 
-        if ($user->is_admin == 3) {
-            $call_ids = Calls::where('user_id', $user->id)->pluck('id')
-                ->toArray();
+        // if ($user->is_admin == 3) {
+        //     $call_ids = Calls::where('user_id', $user->id)->pluck('id')
+        //         ->toArray();
 
-            $call =  ExtraGroups::whereIn('call_id',  $call_ids)->with(['values', 'calls'])->get();
+        //     $call =  ExtraGroups::whereIn('call_id',  $call_ids)->with(['values', 'calls'])->get();
+        // } else {
+        //     $call =  ExtraGroups::with(['values', 'calls'])->get();
+        // }
+        // // $calls =  Calls::where('user_id', $user->id)->get(['id', 'follow_up_date', 'first_name', 'last_name', 'memo']);
+        // return $this->sendResponse($call, 'Events Retrieve successfully.');
+
+        if ($user->is_admin == 3) {
+
+            //$call_ids['follow_up_date'] = Calls::where('user_id', $user->id)->get(['id', 'first_name', 'last_name', 'follow_up_date', 'call_schedule_date']);
+
+            $call_ids['fud'] = Calls::where([['user_id', '=', $user->id], ['follow_up_date', '!=', null]])->get(['id', 'first_name', 'last_name', 'follow_up_date']);
+            $call_ids['csd'] = Calls::where([['user_id', '=', $user->id], ['call_schedule_date', '!=', null]])->get(['id', 'first_name', 'last_name', 'call_schedule_date']);
         } else {
-            $call =  ExtraGroups::with(['values', 'calls'])->get();
+            $call_ids['fud'] = Calls::where('follow_up_date', '!=', null)->get(['id', 'first_name', 'last_name', 'follow_up_date']);
+            $call_ids['csd'] = Calls::where('follow_up_date', '!=', null)->get(['id', 'first_name', 'last_name', 'call_schedule_date']);
         }
-        // $calls =  Calls::where('user_id', $user->id)->get(['id', 'follow_up_date', 'first_name', 'last_name', 'memo']);
-        return $this->sendResponse($call, 'Events Retrieve successfully.');
+
+        return $this->sendResponse($call_ids, 'Events Retrieve successfully.');
     }
 
 
