@@ -57,6 +57,28 @@ class CallsController extends BaseController
         }
     }
 
+    public function reports($off)
+    {
+
+        $user = Auth::user();
+
+        //   return   $user;
+
+        if ($user->is_admin == 3) {
+            $calls = Calls::where(['assigned_to' => $user->id])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->offset($off)->limit(20)->get();
+        } else {
+            $calls = Calls::with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->offset($off)->limit(20)->get();
+        }
+
+
+        return $this->sendResponse($calls, 'Calls Retrieve successfully.');
+    }
+
+
+
+
+
+
 
     private function get_filter_cal($field, $value)
     {
@@ -231,27 +253,41 @@ class CallsController extends BaseController
                 $end = end($follow);
                 // $input['follow_up_date'] = $end['follow_up_date'];
                 $input['follow_up_notes'] = $end['follow_up_notes'];
+                if ($end['f_results'] == 1 && $input['cancel_reason'] != 0) {
+                    $input['results'] = 1;
+                } else if ($end['f_results'] == 2 && isset($input['f_results']) && $input['f_results'] == 2) {
+                    $input['results'] = 2;
+                    $this->register_api(Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number')->get());
+                }
+
+
                 $this->extra_group($input['follow_up'], 'follow_up',  $id);
             }
             isset($input['con_gpa']) &&  $this->extra_group($input['con_gpa'], 'con_gpa',  $id);
-
             isset($input['suppose']) &&  $this->extra_group($input['suppose'], 'suppose', $id);
             isset($input['my_step']) &&  $this->extra_group($input['my_step'], 'my_step',  $id);
-
             $this->extra_single('feedbacks', $input['feedbacks'], $input['user_id'], $input['id'], $input['assigned_to']);
             unset($input['user_id']);
 
-            if ($input['results'] == 4) {
+            if (isset($input['results']) && $input['results'] == 4) {
                 $input['results'] = 3;
                 $input['sections'] = 5;
+            } else if (isset($input['results']) && $input['results'] == 2) {
+                $this->register_api(Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number')->get());
+            } else if ($input['f_results'] == 1 && $input['cancel_reason'] != 0) {
+                $input['results'] = 1;
             }
-            // else if ($input['results'] == 3) {
-            //     $input['sections'] = null;
-            // } 
-            else if ($input['results'] == 2) {
 
+
+            if (isset($input['f_results']) && $input['f_results'] == 4) {
+                $input['results'] = 3;
+                // $input['sections'] = 5;
+            } else if (isset($input['f_results']) && $input['f_results'] == 2) {
+                $input['results'] = 2;
                 $this->register_api(Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number')->get());
             }
+
+
             $data = Calls::updateOrCreate(
                 ['id' =>  (int) $id],
                 $input
@@ -273,7 +309,7 @@ class CallsController extends BaseController
             }
 
 
-            if ($input['results'] == 4) {
+            if ($input['f_results'] == 4) {
                 $input['results'] = 3;
                 $input['sections'] = 5;
             }
@@ -296,8 +332,8 @@ class CallsController extends BaseController
             isset($input['suppose']) &&  $this->extra_group($input['suppose'], 'suppose', $n->id);
             isset($input['my_step']) &&  $this->extra_group($input['my_step'], 'my_step',  $n->id);
 
-            if ($input['results'] == 2) {
-
+            if ($input['f_results'] == 2) {
+                $input['results'] = 2;
                 $this->register_api(Calls::where('id',  $n->id)->select('first_name', 'last_name', 'email', 'phone_number')->get());
             }
 
@@ -380,18 +416,21 @@ class CallsController extends BaseController
             } else  if ($request->name == 'results' && $request->value == '3') { // when no answer selected its will go no answer section
                 Calls::whereIn('id', $request->ids)
                     ->update(['sections' => null, 'results' => 3]);
+            } else  if ($request->name == 'results' && $request->value == '2') { // when no answer selected its will go no answer section
+                Calls::whereIn('id', $request->ids)
+                    ->update(['sections' => null, 'results' => 2]);
+                $this->register_api(Calls::whereIn('id', $request->ids)->select('first_name', 'last_name', 'email', 'phone_number')->get());
             } else {
                 Calls::whereIn('id', $request->ids)->update([$request->name => $request->value]);
             }
 
-
-
-            if ($request->name == 'results' && $request->value == '2') {
-                //  $this->register_api(Calls::whereIn('id', $request->ids)->get());
-
-
-                $this->register_api(Calls::whereIn('id', $request->ids)->select('first_name', 'last_name', 'email', 'phone_number')->get());
+            if ($request->name == 'results') {
+                Calls::whereIn('id', $request->ids)
+                    ->update(['f_results' => $request->value]);
             }
+
+
+
             return $this->sendResponse($this->get_calls(), 'Bulk Update Call successfully.');
         } else {
             $call = Calls::find($id);
