@@ -8,8 +8,8 @@ use App\Models\AdminUsers;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
-use Request;
-
+//use Request;
+use Illuminate\Http\Request;
 use App\Models\Activity;
 
 class BaseController extends Controller
