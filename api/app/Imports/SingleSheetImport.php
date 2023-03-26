@@ -73,6 +73,8 @@ class SingleSheetImport implements ToCollection
                 $in['first_name'] = $row[0];
                 $in['last_name'] = $row[1];
                 $in['phone_number'] = $row[2];
+
+                $in['whatsapp'] = $row[2];
                 $in['email'] = $row[3];
 
                 $in['last_status_notes'] = $row[4];

@@ -23,7 +23,7 @@ class SettingsController extends BaseController
 
     private function all_data()
     {
-        $re['sections'] = Sections::get(['id', 'title', 'theme', 'start_date', 'end_date']);
+        $re['sections'] = Sections::orderBy('sort', 'ASC')->get(['id', 'title', 'theme', 'start_date', 'end_date', 'sort']);
 
         $re['cancel_reason'] = CancelReason::get(['id', 'title']);
         $re['packages'] = Package::get(['id', 'title']);
@@ -136,7 +136,16 @@ class SettingsController extends BaseController
      */
     public function update(Request $request, $id)
     {
+        $data = $request->all();
+
+        foreach ($data as $key => $value) {
+            DB::table($id)->where('id', $value)->limit(1)->update(['sort' => $key]);
+        }
+
+
+
         //
+        return $this->sendResponse($this->all_data(), $id . ' table has been reorder successfully.');
     }
 
     /**
