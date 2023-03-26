@@ -49,7 +49,7 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
     Route::post('call/import', [CallsController::class, 'import']);
     Route::post('call/import_file', [CallsController::class, 'import_file']);
 
-    Route::get('reports/{off}', 'App\Http\Controllers\CallsController@reports');
+    Route::get('reports/{emp_id}/{off}', 'App\Http\Controllers\CallsController@reports');
 
    
 });

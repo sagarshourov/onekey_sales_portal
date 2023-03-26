@@ -57,7 +57,7 @@ class CallsController extends BaseController
         }
     }
 
-    public function reports($off)
+    public function reports($emp_id, $off)
     {
 
         $user = Auth::user();
@@ -67,7 +67,7 @@ class CallsController extends BaseController
         if ($user->is_admin == 3) {
             $calls = Calls::where(['assigned_to' => $user->id])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->offset($off)->limit(20)->get();
         } else {
-            $calls = Calls::with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->offset($off)->limit(20)->get();
+            $calls = Calls::where(['assigned_to' => $emp_id])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->offset($off)->limit(20)->get();
         }
 
 
