@@ -441,7 +441,7 @@ class CallsController extends BaseController
                 CallsExtra::create($input);
             } else if ($request->type == 3) {
                 Calls::withTrashed()->where('id', (int)  $id)
-                    ->update([$request->name => $request->value, 'assigned_to' => $request->user_id, 'assigned_date' => date("Y-m-d H:i:s")]);
+                    ->update([$request->name => $request->value, 'assigned_to' => $request->user_id, 'sections' => null, 'results' => 3, 'assigned_date' => date("Y-m-d H:i:s")]);
             } else  if ($request->name == 'results' && $request->value == '3') { // when no answer selected its will go no answer section
                 Calls::where('id', (int)  $id)
                     ->update(['sections' => null, 'results' => 3]);
