@@ -51,7 +51,7 @@ class Calls extends Model
 
         return $this->hasOne(Priority::class, 'id', 'priority')->select('id', 'title');
     }
-    public function status()
+    public function statu()
     {
 
         return $this->hasOne(Status::class, 'id', 'status')->select('id', 'title');

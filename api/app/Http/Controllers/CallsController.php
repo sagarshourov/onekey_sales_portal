@@ -51,9 +51,9 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            return Calls::where(['assigned_to' => $user->id, 'results' => 3])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->get();
+            return Calls::where(['assigned_to' => $user->id, 'results' => 3])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('id', 'ASC')->get();
         } else {
-            return Calls::where('results', 3)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->get();
+            return Calls::where('results', 3)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('id', 'ASC')->get();
         }
     }
 
@@ -65,9 +65,9 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            $calls = Calls::where(['assigned_to' => $user->id])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->offset($off)->limit(20)->get();
+            $calls = Calls::where(['assigned_to' => $user->id])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->offset($off)->limit(20)->get();
         } else {
-            $calls = Calls::where(['assigned_to' => $emp_id])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->offset($off)->limit(20)->get();
+            $calls = Calls::where(['assigned_to' => $emp_id])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->offset($off)->limit(20)->get();
         }
 
 
@@ -87,9 +87,9 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            return Calls::where(['assigned_to' => $user->id, $field => $value])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->get();
+            return Calls::where(['assigned_to' => $user->id, $field => $value])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->get();
         } else {
-            return Calls::where($field, $value)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->get();
+            return Calls::where($field, $value)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->get();
         }
     }
 
@@ -251,7 +251,7 @@ class CallsController extends BaseController
                 $follow = $input['follow_up'];
                 //unset($input['follow_up']);
                 $end = end($follow);
-                // $input['follow_up_date'] = $end['follow_up_date'];
+                $input['follow_up_date'] = $end['follow_up_date'];
                 $input['follow_up_notes'] = $end['follow_up_notes'];
                 if ($end['f_results'] == 1 && $input['cancel_reason'] != 0) {
                     $input['results'] = 1;
@@ -323,7 +323,7 @@ class CallsController extends BaseController
             //unset($input['follow_up']);
 
             $end = end($follow);
-            // $input['follow_up_date'] = $end['follow_up_date'];
+             $input['follow_up_date'] = $end['follow_up_date'];
             $input['follow_up_notes'] = $end['follow_up_notes'];
 
             isset($input['follow_up']) &&  $this->extra_group($input['follow_up'], 'follow_up', $n->id);
@@ -351,9 +351,9 @@ class CallsController extends BaseController
     public function show($id)
     {
         //
-        $call =  Calls::where('id', $id)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'status', 'package', 'cancel_reason', 'user'])->first();
+        $call =  Calls::where('id', $id)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'statu', 'package', 'cancel_reason', 'user'])->first();
 
-        return $this->sendResponse($call, 'Single Call retrive successfully.');
+        return $this->sendResponse($call, 'Single Call retrieve successfully.');
     }
 
     /**
