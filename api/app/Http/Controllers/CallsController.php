@@ -104,7 +104,16 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin && $user->is_admin == 3) {
-            return Calls::where(['assigned_to' => $user->id, $field => $value])->with($with)->orderBy('id', 'DESC')->offset($off)->limit($limit)->get();
+            // return Calls::where(['assigned_to' => $user->id, $field => $value])->with($with)->orderBy('id', 'DESC')->offset($off)->limit($limit)->get();
+
+
+            if ($search == '0') {
+                return Calls::where(['assigned_to' => $user->id, $field => $null])->with($with)->orderBy('id', 'DESC')->offset($off)->limit($limit)->get();
+            } else if ($field == 'sections' && $search != '0') {
+                return Calls::where(['assigned_to', '=', $user->id], ['email', 'like', '%' . $query . '%'])->with($with)->get();
+            } else {
+                return Calls::where([['assigned_to', '=', $user->id], [$field, '=',  $null], ['email', 'like', '%' . $query . '%']])->with($with)->get();
+            }
         } else {
             if ($search == '0') {
                 return Calls::where($field,  $null)->with($with)->orderBy('id', 'DESC')->offset($off)->limit($limit)->get();
@@ -338,9 +347,9 @@ class CallsController extends BaseController
                 $input['sections'] = 5;
             }
 
-           // $last =  Calls::orderBy('id', 'desc')->first();
+            // $last =  Calls::orderBy('id', 'desc')->first();
 
-          //  $input['sort'] =  $last->sort;
+            //  $input['sort'] =  $last->sort;
 
             // else if ($input['results'] == 3) {
             //     $input['sections'] = null;
@@ -349,7 +358,7 @@ class CallsController extends BaseController
             $n = Calls::create($input);
 
             Calls::where('id', $n->id)
-            ->update(['sort' => $n->id]);
+                ->update(['sort' => $n->id]);
 
 
             $follow = $input['follow_up'];
