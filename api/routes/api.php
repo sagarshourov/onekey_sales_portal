@@ -27,11 +27,21 @@ Route::get('file/{folder}/{path}', 'App\Http\Controllers\FileController@getFile'
 Route::post('forgot', 'App\Http\Controllers\AuthController@forgot');
 Route::post('forgot_password', 'App\Http\Controllers\AuthController@forgot_password');
 
+Route::get('calls_sorts', 'App\Http\Controllers\CallsController@calls_sorts');
+
 Route::resource('whatsapp', WaController::class);
 Route::post('record_upload', 'App\Http\Controllers\FileController@record_upload');
-
+Route::get('call_filter/{results}/{value}/{off}/{limit}/{search}', 'App\Http\Controllers\CallsController@filter');
 Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"], function () {
-    Route::get('call_filter/{results}/{value}', 'App\Http\Controllers\CallsController@filter');
+    Route::get('call_filter/{results}/{value}/{off}/{limit}/{search}', 'App\Http\Controllers\CallsController@filter');
+
+
+    Route::post('calls_sort', 'App\Http\Controllers\CallsController@calls_sort');
+
+
+
+
+
     Route::post('file_upload', 'App\Http\Controllers\FileController@file_upload');
     Route::get('check/{field}/{value}', 'App\Http\Controllers\CallsController@check');
     Route::get('userinfo/{id}', 'App\Http\Controllers\AuthController@userinfo');
@@ -50,8 +60,6 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
     Route::post('call/import_file', [CallsController::class, 'import_file']);
 
     Route::get('reports/{emp_id}/{off}', 'App\Http\Controllers\CallsController@reports');
-
-   
 });
 
 Route::get('whatsapp/record_history/{id}', 'App\Http\Controllers\FileController@record_history');

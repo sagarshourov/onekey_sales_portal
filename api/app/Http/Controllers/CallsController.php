@@ -51,9 +51,9 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            return Calls::where(['assigned_to' => $user->id, 'results' => 3])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('id', 'ASC')->get();
+            return Calls::where(['assigned_to' => $user->id, 'results' => 3])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'ASC')->get();
         } else {
-            return Calls::where('results', 3)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('id', 'ASC')->get();
+            return Calls::where('results', 3)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'ASC')->get();
         }
     }
 
@@ -80,25 +80,48 @@ class CallsController extends BaseController
 
 
 
-    private function get_filter_cal($field, $value)
+    private function get_filter_cal($field, $value, $off, $limit, $search)
     {
+
         $user = Auth::user();
+
+
+        $query = '';
+        if ($search == '0') {
+            $query = '';
+        } else {
+            $query = $search;
+        }
+
+        $with = array('extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'statu', 'package', 'cancel_reason', 'user');
+
+        $null = $value;
+        if ($value == 'null') $null = NULL;
+
+
+
 
         //   return   $user;
 
-        if ($user->is_admin == 3) {
-            return Calls::where(['assigned_to' => $user->id, $field => $value])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->get();
+        if ($user->is_admin && $user->is_admin == 3) {
+            return Calls::where(['assigned_to' => $user->id, $field => $value])->with($with)->orderBy('id', 'DESC')->offset($off)->limit($limit)->get();
         } else {
-            return Calls::where($field, $value)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->get();
+            if ($search == '0') {
+                return Calls::where($field,  $null)->with($with)->orderBy('id', 'DESC')->offset($off)->limit($limit)->get();
+            } else if ($field == 'sections' && $search != '0') {
+                return Calls::where('email', 'like', '%' . $query . '%')->with($with)->get();
+            } else {
+                return Calls::where([[$field, '=',  $null], ['email', 'like', '%' . $query . '%']])->with($with)->get();
+            }
         }
     }
 
 
 
 
-    public function filter($field, $value)
+    public function filter($field, $value, $off, $limit, $search)
     {
-        $filter = $this->get_filter_cal($field, $value);
+        $filter = $this->get_filter_cal($field, $value, $off, $limit, $search);
 
 
         return $this->sendResponse($filter, 'Retrieve calls.');
@@ -255,7 +278,8 @@ class CallsController extends BaseController
                 $input['follow_up_notes'] = $end['follow_up_notes'];
                 if ($end['f_results'] == 1 && $input['cancel_reason'] != 0) {
                     $input['results'] = 1;
-                } else if ($end['f_results'] == 2 && isset($input['f_results']) && $input['f_results'] == 2) {
+                    //} else if ($end['f_results'] == 2 && isset($input['f_results']) && $input['f_results'] == 2) {
+                } else if ($end['f_results'] == 2) {
                     $input['results'] = 2;
                     $this->register_api(Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number')->get());
                 }
@@ -314,16 +338,25 @@ class CallsController extends BaseController
                 $input['sections'] = 5;
             }
 
+           // $last =  Calls::orderBy('id', 'desc')->first();
+
+          //  $input['sort'] =  $last->sort;
+
             // else if ($input['results'] == 3) {
             //     $input['sections'] = null;
             // }
 
             $n = Calls::create($input);
+
+            Calls::where('id', $n->id)
+            ->update(['sort' => $n->id]);
+
+
             $follow = $input['follow_up'];
             //unset($input['follow_up']);
 
             $end = end($follow);
-             $input['follow_up_date'] = $end['follow_up_date'];
+            $input['follow_up_date'] = $end['follow_up_date'];
             $input['follow_up_notes'] = $end['follow_up_notes'];
 
             isset($input['follow_up']) &&  $this->extra_group($input['follow_up'], 'follow_up', $n->id);
@@ -366,6 +399,104 @@ class CallsController extends BaseController
     {
         //
     }
+
+
+
+    public function calls_sorts()
+    {
+
+        $calls = Calls::all();
+
+        foreach ($calls as $key => $value) {
+
+            Calls::where('id', $value['id'])
+                ->update(['sort' => $key]);
+        }
+    }
+
+
+
+    public function calls_sort(Request $request)
+    {
+
+        if ($request->start == null || $request->end == null)   return $this->sendResponse($this->get_calls(), 'Calls short successfully.');
+
+
+
+
+        $start = (int) $request->start;
+        $end = (int) $request->end;
+
+
+        if ($end >  $start) {
+            $all = Calls::whereBetween('sort', [$start, $end])->get();
+
+
+            Calls::where('sort', $start)
+                ->update(['sort' => $end]);
+
+            $count =  count($all);
+
+            $count = $count - 1;
+            for ($i = $count; $i > -1; $i--) {
+                $value = $all[$i];
+                $end = $end - 1;
+                $sort = (int) $value->sort;
+
+                if ($sort == $start) {
+                } else {
+                    Calls::where('id', $value->id)
+                        ->update(['sort' =>  $end]);
+                }
+            }
+
+
+            // foreach ($all as $key => $value) {
+
+            //     $sort = (int) $value->sort;
+
+            //     if ($sort == $start) {
+            //     } else {
+            //         Calls::where('id', $value->id)
+            //             ->update(['sort' =>  $end]);
+            //     }
+            // }
+
+
+
+
+            // return $this->sendResponse($all, 'Calls  lower short successfully.');
+        } else {
+            $all = Calls::whereBetween('sort', [$end, $start])->get(); // here start is big and start > end
+
+            Calls::where('sort', $start)
+                ->update(['sort' => $end]);
+            foreach ($all as $key => $value) {
+                $end = $end + 1;
+                $sort = (int) $value->sort;
+
+                if ($sort == $start) {
+                } else {
+                    Calls::where('id', $value->id)
+                        ->update(['sort' =>  $end]);
+                }
+            }
+
+            // return $this->sendResponse($all, 'Calls upper  short successfully.');
+        }
+
+
+        // foreach ($all as $key => $value) {
+
+
+        // }
+
+
+
+        return $this->sendResponse($this->get_calls(), 'Calls short successfully.');
+    }
+
+
 
 
     public function call_single(Request $request, $id)
