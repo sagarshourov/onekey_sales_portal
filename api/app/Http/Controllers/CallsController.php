@@ -14,6 +14,7 @@ use App\Imports\CallImport;
 use App\Models\Package;
 use App\Models\Sections;
 use App\Models\Status;
+use App\Models\Notifications;
 
 use Illuminate\Support\Facades\Http;
 
@@ -37,6 +38,16 @@ class CallsController extends BaseController
             return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars. 
         }
     }
+
+    private function create_call_extra($filed, $value, $user_id, $call_id)
+    {
+        $input['call_id'] = (int) $call_id;
+        $input['field'] = $filed;
+        $input['value'] =  $value;
+        $input['user_id'] = (int) $user_id;
+        CallsExtra::create($input);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -51,11 +62,25 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            return Calls::where(['assigned_to' => $user->id, 'results' => 3])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'ASC')->get();
+            return Calls::where(['assigned_to' => $user->id, 'results' => 3])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'ASC')->get();
         } else {
-            return Calls::where('results', 3)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'ASC')->get();
+            return Calls::where('results', 3)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'ASC')->get();
         }
     }
+    private function get_Cancel_calls()
+    {
+
+        $user = Auth::user();
+
+        //   return   $user;
+
+        if ($user->is_admin == 3) {
+            return Calls::where(['assigned_to' => $user->id, 'results' => 3])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'DESC')->get();
+        } else {
+            return Calls::where('results', 3)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'DESC')->get();
+        }
+    }
+
 
     public function reports($emp_id, $off)
     {
@@ -65,9 +90,9 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            $calls = Calls::where(['assigned_to' => $user->id])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->offset($off)->limit(20)->get();
+            $calls = Calls::where(['assigned_to' => $user->id])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->offset($off)->limit(20)->get();
         } else {
-            $calls = Calls::where(['assigned_to' => $emp_id])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->offset($off)->limit(20)->get();
+            $calls = Calls::where(['assigned_to' => $emp_id])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('id', 'desc')->offset($off)->limit(20)->get();
         }
 
 
@@ -80,7 +105,7 @@ class CallsController extends BaseController
 
 
 
-    private function get_filter_cal($field, $value, $off, $limit, $search)
+    private function get_filter_cal($field, $value, $off, $limit, $search, $order)
     {
 
         $user = Auth::user();
@@ -93,7 +118,7 @@ class CallsController extends BaseController
             $query = $search;
         }
 
-        $with = array('extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priority', 'statu', 'package', 'cancel_reason', 'user');
+        $with = array('extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user');
 
         $null = $value;
         if ($value == 'null') $null = NULL;
@@ -108,7 +133,9 @@ class CallsController extends BaseController
 
 
             if ($search == '0') {
-                return Calls::where(['assigned_to' => $user->id, $field => $null])->with($with)->orderBy('id', 'DESC')->offset($off)->limit($limit)->get();
+
+
+                return Calls::where($field, '=', $null)->where('assigned_to', '=', $user->id)->with($with)->orderBy('sort', $order)->offset($off)->limit($limit)->get();
             } else if ($field == 'sections' && $search != '0') {
                 return Calls::where(['assigned_to', '=', $user->id], ['email', 'like', '%' . $query . '%'])->with($with)->get();
             } else {
@@ -116,7 +143,7 @@ class CallsController extends BaseController
             }
         } else {
             if ($search == '0') {
-                return Calls::where($field,  $null)->with($with)->orderBy('id', 'DESC')->offset($off)->limit($limit)->get();
+                return Calls::where($field,  $null)->with($with)->orderBy('sort', $order)->offset($off)->limit($limit)->get();
             } else if ($field == 'sections' && $search != '0') {
                 return Calls::where('email', 'like', '%' . $query . '%')->with($with)->get();
             } else {
@@ -128,9 +155,9 @@ class CallsController extends BaseController
 
 
 
-    public function filter($field, $value, $off, $limit, $search)
+    public function filter($field, $value, $off, $limit, $search, $order)
     {
-        $filter = $this->get_filter_cal($field, $value, $off, $limit, $search);
+        $filter = $this->get_filter_cal($field, $value, $off, $limit, $search, $order);
 
 
         return $this->sendResponse($filter, 'Retrieve calls.');
@@ -214,7 +241,7 @@ class CallsController extends BaseController
         foreach ($all as $child) {
             $parent = ExtraGroups::find($child->id);
             $parent->values()->forceDelete();
-            $parent->delete();
+            $parent->forceDelete();
         }
     }
 
@@ -243,16 +270,17 @@ class CallsController extends BaseController
         }
     }
 
+
+
+
     private function extra_single($filed, $value, $user_id, $call_id, $call_user_id)
     {
         $user = Auth::user();
         if ($call_user_id == $user->id) {
-        } else {
-            $input['call_id'] = (int) $call_id;
-            $input['field'] = $filed;
-            $input['value'] =  $value;
-            $input['user_id'] = (int) $user_id;
-            CallsExtra::create($input);
+        } else if ($value != '') {
+
+
+            $this->create_call_extra($filed, $value, $user_id, $call_id);
         }
 
 
@@ -261,6 +289,15 @@ class CallsController extends BaseController
         // $input['value'] =  $value . $user_id;
         // $input['user_id'] =  $user->id;
         // CallsExtra::create($input);
+    }
+
+
+    private function assigned_to($assign_to, $old_assign, $call_id)
+    {
+        if ($assign_to != $old_assign) {
+
+            $this->create_call_extra('assigned_to', 'Assign To', $assign_to, $call_id);
+        }
     }
 
 
@@ -274,11 +311,17 @@ class CallsController extends BaseController
      */
     public function store(Request $request)
     {
+
+        $last = Calls::latest()->first();
         //
         $input = $request->all();
         // return $this->sendResponse($input, 'Calls add  successfully.');
         if (isset($input['id'])) {
             $id =  $input['id'];
+
+            $old_call = Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number', 'assigned_to')->get();
+
+
             if (isset($input['follow_up'])) {
                 $follow = $input['follow_up'];
                 //unset($input['follow_up']);
@@ -287,28 +330,32 @@ class CallsController extends BaseController
                 $input['follow_up_notes'] = $end['follow_up_notes'];
                 if ($end['f_results'] == 1 && $input['cancel_reason'] != 0) {
                     $input['results'] = 1;
+                    $input['sort'] =  $last->sort + 1;
                     //} else if ($end['f_results'] == 2 && isset($input['f_results']) && $input['f_results'] == 2) {
                 } else if ($end['f_results'] == 2) {
                     $input['results'] = 2;
-                    $this->register_api(Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number')->get());
+                    $this->register_api($old_call);
                 }
 
 
                 $this->extra_group($input['follow_up'], 'follow_up',  $id);
             }
+            isset($input['assigned_to']) &&  $this->assigned_to((int)$input['assigned_to'], (int) $old_call[0]->assigned_to, (int) $id);
             isset($input['con_gpa']) &&  $this->extra_group($input['con_gpa'], 'con_gpa',  $id);
             isset($input['suppose']) &&  $this->extra_group($input['suppose'], 'suppose', $id);
             isset($input['my_step']) &&  $this->extra_group($input['my_step'], 'my_step',  $id);
             $this->extra_single('feedbacks', $input['feedbacks'], $input['user_id'], $input['id'], $input['assigned_to']);
             unset($input['user_id']);
 
+
             if (isset($input['results']) && $input['results'] == 4) {
                 $input['results'] = 3;
                 $input['sections'] = 5;
             } else if (isset($input['results']) && $input['results'] == 2) {
-                $this->register_api(Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number')->get());
+                $this->register_api($old_call);
             } else if ($input['f_results'] == 1 && $input['cancel_reason'] != 0) {
                 $input['results'] = 1;
+                $input['sort'] =  $last->sort + 1;
             }
 
 
@@ -317,7 +364,7 @@ class CallsController extends BaseController
                 // $input['sections'] = 5;
             } else if (isset($input['f_results']) && $input['f_results'] == 2) {
                 $input['results'] = 2;
-                $this->register_api(Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number')->get());
+                $this->register_api($old_call);
             }
 
 
@@ -329,16 +376,21 @@ class CallsController extends BaseController
             //  $this->extra_insert($input, array('note', 'last_status_notes'));
             return $this->sendResponse($this->get_calls(), 'Call Update successfully.');
         } else {
-            $messages = [
-                'unique' => 'taken',
-            ];
-            $validator = Validator::make($input, [
-                'email' => 'required|email|regex:/(.+)@(.+)\.(.+)/i|unique:calls',
-            ],  $messages);
-            if ($validator->fails()) {
-                $call =  Calls::withTrashed()->where('email', $input['email'])->first();
-                return $this->sendError($validator->errors(), $call);
-                //return $this->sendError('Validation Error.', $validator->errors());
+
+
+            if ($input['email'] != '') {
+
+                $messages = [
+                    'unique' => 'taken',
+                ];
+                $validator = Validator::make($input, [
+                    'email' => 'required|email|regex:/(.+)@(.+)\.(.+)/i|unique:calls',
+                ],  $messages);
+                if ($validator->fails()) {
+                    $call =  Calls::withTrashed()->where('email', $input['email'])->first();
+                    return $this->sendError($validator->errors(), $call);
+                    //return $this->sendError('Validation Error.', $validator->errors());
+                }
             }
 
 
@@ -393,7 +445,7 @@ class CallsController extends BaseController
     public function show($id)
     {
         //
-        $call =  Calls::where('id', $id)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priority', 'statu', 'package', 'cancel_reason', 'user'])->first();
+        $call =  Calls::where('id', $id)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->first();
 
         return $this->sendResponse($call, 'Single Call retrieve successfully.');
     }
@@ -438,7 +490,7 @@ class CallsController extends BaseController
 
 
         if ($end >  $start) {
-            $all = Calls::whereBetween('sort', [$start, $end])->get();
+            $all = Calls::whereBetween('sort', [$start, $end])->orderBy('sort', 'ASC')->get();
 
 
             Calls::where('sort', $start)
@@ -476,7 +528,7 @@ class CallsController extends BaseController
 
             // return $this->sendResponse($all, 'Calls  lower short successfully.');
         } else {
-            $all = Calls::whereBetween('sort', [$end, $start])->get(); // here start is big and start > end
+            $all = Calls::whereBetween('sort', [$end, $start])->orderBy('sort', 'ASC')->get(); // here start is big and start > end
 
             Calls::where('sort', $start)
                 ->update(['sort' => $end]);
@@ -539,6 +591,34 @@ class CallsController extends BaseController
      * @return \Illuminate\Http\Response
      */
 
+    private function get_noti()
+    {
+        $user = Auth::user();
+
+        if ($user->is_admin == 1 || $user->is_admin == 2) {
+            return Notifications::where('to_id', $user->id)->orWhere('to_id',null)->with(['types', 'user', 'receiver'])->orderBy('id', 'DESC')->get();
+        }else{
+            return Notifications::where('to_id', $user->id)->with(['types', 'user', 'receiver'])->orderBy('id', 'DESC')->get();
+        }
+
+
+        
+    }
+
+    private function create_notification($type, $content, $is_read, $sender, $receiver, $call_id)
+    {
+        $input['type'] = $type;
+        $input['content'] = $content; //  $calls->email . ' Transferred to you successfully !';
+
+        $input['is_read'] = $is_read;
+
+        $input['user_id'] = $sender;
+
+        $input['to_id'] = $receiver;
+        $input['call_id'] = $call_id;
+
+        Notifications::create($input);
+    }
 
 
 
@@ -549,13 +629,44 @@ class CallsController extends BaseController
 
 
 
+
+
         if ($id == 0) {
             if ($request->name == 'results' && $request->value == '4') { // when no answer selected its will go no answer section
                 Calls::whereIn('id', $request->ids)
                     ->update(['sections' => 5]);
-            } else  if ($request->name == 'results' && $request->value == '3') { // when no answer selected its will go no answer section
+            } else  if ($request->name == 'results' && $request->value == '3') { // when no answer selected its will go no open section
+
+                //   return 'update nn';
+
                 Calls::whereIn('id', $request->ids)
                     ->update(['sections' => null, 'results' => 3]);
+
+
+                foreach ($request->ids as $call_id) {
+
+
+                    $ext = ExtraGroups::create([
+                        'call_id' => (int) $call_id,
+                        'groups' => 'follow_up'
+                    ]);
+
+                    ExtraValues::create([
+                        'field' => 'follow_up_date',
+                        'value' => date("Y-m-d"),
+                        'ext_id' => $ext->id
+                    ]);
+                    ExtraValues::create([
+                        'field' => 'f_results',
+                        'value' => 3,
+                        'ext_id' => $ext->id
+                    ]);
+                    ExtraValues::create([
+                        'field' => 'follow_up_notes',
+                        'value' => '',
+                        'ext_id' => $ext->id
+                    ]);
+                }
             } else  if ($request->name == 'results' && $request->value == '2') { // when no answer selected its will go no answer section
                 Calls::whereIn('id', $request->ids)
                     ->update(['sections' => null, 'results' => 2]);
@@ -580,8 +691,24 @@ class CallsController extends BaseController
                 $input['value'] =  $call[$request->name];
                 CallsExtra::create($input);
             } else if ($request->type == 3) {
+                $user = Auth::user();
+                $this->create_call_extra('assigned_to', 'Assigned from notification', $request->user_id, (int) $id);
+
+
                 Calls::withTrashed()->where('id', (int)  $id)
                     ->update([$request->name => $request->value, 'assigned_to' => $request->user_id, 'sections' => null, 'results' => 3, 'assigned_date' => date("Y-m-d H:i:s")]);
+
+                $calls = Calls::find((int) $id);
+
+
+                $emp_content = $calls->email . ' Transferred to you successfully !';
+                $admin_content = 'The transfer was done successfully';
+
+                $this->create_notification(3, $emp_content, 0, $user->id, $request->user_id, (int)  $id); //emp_notification
+
+                $this->create_notification(3, $admin_content, 0, $request->user_id, $user->id, (int)  $id); //admin_notification
+
+                return $this->sendResponse(array('noti' => $this->get_noti(), 'call' => Calls::withTrashed()->with(['user'])->where('id', (int) $id)->first()), 'Notifications updated  successfully.');
             } else  if ($request->name == 'results' && $request->value == '3') { // when no answer selected its will go no answer section
                 Calls::where('id', (int)  $id)
                     ->update(['sections' => null, 'results' => 3]);

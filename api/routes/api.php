@@ -31,9 +31,9 @@ Route::get('calls_sorts', 'App\Http\Controllers\CallsController@calls_sorts');
 
 Route::resource('whatsapp', WaController::class);
 Route::post('record_upload', 'App\Http\Controllers\FileController@record_upload');
-Route::get('call_filter/{results}/{value}/{off}/{limit}/{search}', 'App\Http\Controllers\CallsController@filter');
+Route::get('call_filter/{results}/{value}/{off}/{limit}/{search}/{order}', 'App\Http\Controllers\CallsController@filter');
 Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"], function () {
-    Route::get('call_filter/{results}/{value}/{off}/{limit}/{search}', 'App\Http\Controllers\CallsController@filter');
+    Route::get('call_filter/{results}/{value}/{off}/{limit}/{search}/{order}', 'App\Http\Controllers\CallsController@filter');
 
 
     Route::post('calls_sort', 'App\Http\Controllers\CallsController@calls_sort');
@@ -50,6 +50,11 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
     Route::put('call_single/{id}', 'App\Http\Controllers\CallsController@call_single');
     Route::post('call_export', 'App\Http\Controllers\CallsController@call_export');
     Route::resource('notifications', NotiController::class);
+
+    Route::post('read_all_noti', 'App\Http\Controllers\NotiController@read_all_noti');
+
+
+
     Route::resource('settings', SettingsController::class);
     Route::get('settings/{table}/{id}', 'App\Http\Controllers\SettingsController@destroy');
     Route::get('events', 'App\Http\Controllers\CallsController@events');

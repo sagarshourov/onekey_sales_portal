@@ -16,7 +16,7 @@ class Notifications extends Model
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'type', 'content', 'is_read',  'user_id', 'call_id'
+        'type', 'content', 'is_read',  'user_id', 'call_id', 'to_id'
     ];
 
 
@@ -28,5 +28,10 @@ class Notifications extends Model
     public function user()
     {
         return $this->hasOne(User::class, 'id', 'user_id')->select('id', 'first_name', 'last_name');
+    }
+
+    public function receiver()
+    {
+        return $this->hasOne(User::class, 'id', 'to_id')->select('id', 'first_name', 'last_name');
     }
 }

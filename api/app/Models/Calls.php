@@ -27,7 +27,7 @@ class Calls extends Model
 
     public function history()
     {
-        return $this->hasMany(CallsExtra::class, 'call_id', 'id')->select('id', 'call_id', 'field', 'value', 'created_at', 'user_id');
+        return $this->hasMany(CallsExtra::class, 'call_id', 'id')->orderBy('id','DESC')->select('id', 'call_id', 'field', 'value', 'created_at', 'user_id');
     }
 
 
@@ -46,7 +46,7 @@ class Calls extends Model
 
 
 
-    public function priority()
+    public function priorities()
     {
 
         return $this->hasOne(Priority::class, 'id', 'priority')->select('id', 'title');
