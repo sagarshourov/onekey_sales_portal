@@ -62,9 +62,9 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            return Calls::where(['assigned_to' => $user->id, 'results' => 3])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'ASC')->get();
+            return Calls::where(['assigned_to' => $user->id, 'results' => 3])->orWhere('results', 2)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'ASC')->get();
         } else {
-            return Calls::where('results', 3)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'ASC')->get();
+            return Calls::where('results', 3)->orWhere('results', 2)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'ASC')->get();
         }
     }
     private function get_Cancel_calls()
@@ -334,7 +334,7 @@ class CallsController extends BaseController
                     //} else if ($end['f_results'] == 2 && isset($input['f_results']) && $input['f_results'] == 2) {
                 } else if ($end['f_results'] == 2) {
                     $input['results'] = 2;
-                    $this->register_api($old_call);
+                      $this->register_api($old_call);
                 }
 
 
@@ -352,7 +352,7 @@ class CallsController extends BaseController
                 $input['results'] = 3;
                 $input['sections'] = 5;
             } else if (isset($input['results']) && $input['results'] == 2) {
-                $this->register_api($old_call);
+                 $this->register_api($old_call);
             } else if ($input['f_results'] == 1 && $input['cancel_reason'] != 0) {
                 $input['results'] = 1;
                 $input['sort'] =  $last->sort + 1;
@@ -361,10 +361,10 @@ class CallsController extends BaseController
 
             if (isset($input['f_results']) && $input['f_results'] == 4) {
                 $input['results'] = 3;
-                // $input['sections'] = 5;
+                $input['sections'] = 5;
             } else if (isset($input['f_results']) && $input['f_results'] == 2) {
                 $input['results'] = 2;
-                $this->register_api($old_call);
+                  $this->register_api($old_call);
             }
 
 
@@ -596,13 +596,10 @@ class CallsController extends BaseController
         $user = Auth::user();
 
         if ($user->is_admin == 1 || $user->is_admin == 2) {
-            return Notifications::where('to_id', $user->id)->orWhere('to_id',null)->with(['types', 'user', 'receiver'])->orderBy('id', 'DESC')->get();
-        }else{
+            return Notifications::where('to_id', $user->id)->orWhere('to_id', null)->with(['types', 'user', 'receiver'])->orderBy('id', 'DESC')->get();
+        } else {
             return Notifications::where('to_id', $user->id)->with(['types', 'user', 'receiver'])->orderBy('id', 'DESC')->get();
         }
-
-
-        
     }
 
     private function create_notification($type, $content, $is_read, $sender, $receiver, $call_id)
