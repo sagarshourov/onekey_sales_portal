@@ -33,14 +33,9 @@ Route::resource('whatsapp', WaController::class);
 Route::post('record_upload', 'App\Http\Controllers\FileController@record_upload');
 Route::get('call_filter/{results}/{value}/{off}/{limit}/{search}/{order}', 'App\Http\Controllers\CallsController@filter');
 Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"], function () {
-    Route::get('call_filter/{results}/{value}/{off}/{limit}/{search}/{order}', 'App\Http\Controllers\CallsController@filter');
-
+    Route::get('call_filter/{user_id}/{results}/{value}/{off}/{limit}/{search}/{order}', 'App\Http\Controllers\CallsController@filter');
 
     Route::post('calls_sort', 'App\Http\Controllers\CallsController@calls_sort');
-
-
-
-
 
     Route::post('file_upload', 'App\Http\Controllers\FileController@file_upload');
     Route::get('check/{field}/{value}', 'App\Http\Controllers\CallsController@check');
@@ -65,6 +60,16 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
     Route::post('call/import_file', [CallsController::class, 'import_file']);
 
     Route::get('reports/{emp_id}/{off}', 'App\Http\Controllers\CallsController@reports');
+
+
+    Route::get('pre_filter/{startDate}/{endDate}/{users}/{type}/{off}/{limit}/{order}', 'App\Http\Controllers\CallsController@pre_filter');
+
+    
+
+
+
+
+
 });
 
 Route::get('whatsapp/record_history/{id}', 'App\Http\Controllers\FileController@record_history');

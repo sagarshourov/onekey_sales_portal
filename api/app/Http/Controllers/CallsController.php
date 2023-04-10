@@ -62,7 +62,7 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            return Calls::where(['assigned_to' => $user->id, 'results' => 3])->orWhere('results', 2)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'ASC')->get();
+            return Calls::where('assigned_to', $user->id)->WhereIn('results', [2, 3])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'ASC')->get();
         } else {
             return Calls::where('results', 3)->orWhere('results', 2)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'ASC')->get();
         }
@@ -105,7 +105,7 @@ class CallsController extends BaseController
 
 
 
-    private function get_filter_cal($field, $value, $off, $limit, $search, $order)
+    private function get_filter_cal($user_id, $field, $value, $off, $limit, $search, $order)
     {
 
         $user = Auth::user();
@@ -141,7 +141,16 @@ class CallsController extends BaseController
             } else {
                 return Calls::where([['assigned_to', '=', $user->id], [$field, '=',  $null], ['email', 'like', '%' . $query . '%']])->with($with)->get();
             }
+        } else if ($user_id != 0) {
+            if ($search == '0') {
+                return Calls::where([['assigned_to', '=', $user_id], [$field, '=',  $null]])->with($with)->orderBy('sort', $order)->offset($off)->limit($limit)->get();
+            } else if ($field == 'sections' && $search != '0') {
+                return Calls::where('email', 'like', '%' . $query . '%')->with($with)->get();
+            } else {
+                return Calls::where([['assigned_to', '=', $user_id], [$field, '=',  $null], ['email', 'like', '%' . $query . '%']])->with($with)->get();
+            }
         } else {
+
             if ($search == '0') {
                 return Calls::where($field,  $null)->with($with)->orderBy('sort', $order)->offset($off)->limit($limit)->get();
             } else if ($field == 'sections' && $search != '0') {
@@ -155,12 +164,58 @@ class CallsController extends BaseController
 
 
 
-    public function filter($field, $value, $off, $limit, $search, $order)
+    public function filter($user_id, $field, $value, $off, $limit, $search, $order)
     {
-        $filter = $this->get_filter_cal($field, $value, $off, $limit, $search, $order);
+        $filter = $this->get_filter_cal($user_id, $field, $value, $off, $limit, $search, $order);
 
 
         return $this->sendResponse($filter, 'Retrieve calls.');
+    }
+
+
+
+    public function pre_filter($startDate, $endDate, $users, $type, $off, $limit,  $order)
+    {
+
+        if ($type == 10) {
+            $calls = Calls::WhereIn('assigned_to', explode(',', $users))
+                ->where('ag', 1)
+                ->whereBetween('agree_date_sent', array($startDate, $endDate))
+                ->offset($off)->limit($limit)
+                ->get();
+        } else if ($type == 11) {
+            $calls = Calls::WhereIn('assigned_to',  explode(',', $users))
+                ->where('agreed_to_signed', 1)
+                ->whereBetween('agreement_signed_date', array($startDate, $endDate))
+                ->offset($off)->limit($limit)
+                ->get();
+        } else if ($type == 12) {
+            $calls = Calls::WhereIn('assigned_to',  explode(',', $users))
+                ->whereBetween('first_contact', array($startDate, $endDate))
+                ->offset($off)->limit($limit)
+                ->get();
+        } else if ($type == 13) {
+            $calls = Calls::WhereIn('assigned_to',  explode(',', $users))
+                ->whereBetween('follow_up_date', array($startDate, $endDate))
+                ->offset($off)->limit($limit)
+                ->get();
+        } else if ($type == 14) {
+            $calls = Calls::WhereIn('assigned_to',  explode(',', $users))
+                ->whereBetween('cancel_date', array($startDate, $endDate))
+                ->offset($off)->limit($limit)
+                ->get();
+        } else {
+            $calls = Calls::WhereIn('assigned_to', explode(',', $users))
+                ->where('status', $type)
+                ->offset($off)->limit($limit)
+                // ->whereBetween('created_at', array($startDate, $endDate))
+                ->get();
+        }
+
+
+
+
+        return $this->sendResponse($calls, 'Retrieve calls.');
     }
 
 
@@ -334,7 +389,7 @@ class CallsController extends BaseController
                     //} else if ($end['f_results'] == 2 && isset($input['f_results']) && $input['f_results'] == 2) {
                 } else if ($end['f_results'] == 2) {
                     $input['results'] = 2;
-                      $this->register_api($old_call);
+                    $this->register_api($old_call);
                 }
 
 
@@ -352,7 +407,7 @@ class CallsController extends BaseController
                 $input['results'] = 3;
                 $input['sections'] = 5;
             } else if (isset($input['results']) && $input['results'] == 2) {
-                 $this->register_api($old_call);
+                $this->register_api($old_call);
             } else if ($input['f_results'] == 1 && $input['cancel_reason'] != 0) {
                 $input['results'] = 1;
                 $input['sort'] =  $last->sort + 1;
@@ -364,7 +419,7 @@ class CallsController extends BaseController
                 $input['sections'] = 5;
             } else if (isset($input['f_results']) && $input['f_results'] == 2) {
                 $input['results'] = 2;
-                  $this->register_api($old_call);
+                $this->register_api($old_call);
             }
 
 
