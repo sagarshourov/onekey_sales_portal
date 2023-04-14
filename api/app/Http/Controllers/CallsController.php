@@ -408,7 +408,7 @@ class CallsController extends BaseController
                 $input['sections'] = 5;
             } else if (isset($input['results']) && $input['results'] == 2) {
                 $this->register_api($old_call);
-            } else if ($input['f_results'] == 1 && $input['cancel_reason'] != 0) {
+            } else if ($input['cancel_reason'] != 0) {
                 $input['results'] = 1;
                 $input['sort'] =  $last->sort + 1;
             }
@@ -826,8 +826,8 @@ class CallsController extends BaseController
 
             //$call_ids['follow_up_date'] = Calls::where('user_id', $user->id)->get(['id', 'first_name', 'last_name', 'follow_up_date', 'call_schedule_date']);
 
-            $call_ids['fud'] = Calls::where([['user_id', '=', $user->id], ['follow_up_date', '!=', null]])->get(['id', 'first_name', 'last_name', 'follow_up_date']);
-            $call_ids['csd'] = Calls::where([['user_id', '=', $user->id], ['call_schedule_date', '!=', null]])->get(['id', 'first_name', 'last_name', 'call_schedule_date']);
+            $call_ids['fud'] = Calls::where([['assigned_to', '=', $user->id], ['follow_up_date', '!=', null]])->get(['id', 'first_name', 'last_name', 'follow_up_date', 'call_schedule_time as cst']);
+            $call_ids['csd'] = Calls::where([['assigned_to', '=', $user->id], ['call_schedule_date', '!=', null]])->get(['id', 'first_name', 'last_name', 'call_schedule_date', 'call_schedule_time as cst']);
         } else {
             $call_ids['fud'] = Calls::where('follow_up_date', '!=', null)->get(['id', 'first_name', 'last_name', 'follow_up_date']);
             $call_ids['csd'] = Calls::where('follow_up_date', '!=', null)->get(['id', 'first_name', 'last_name', 'call_schedule_date']);
