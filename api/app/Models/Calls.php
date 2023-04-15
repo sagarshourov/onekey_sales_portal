@@ -22,7 +22,7 @@ class Calls extends Model
 
     public function extra()
     {
-        return $this->hasMany(ExtraGroups::class, 'call_id', 'id')->select('id', 'groups', 'call_id');
+        return $this->hasMany(ExtraGroups::class, 'call_id', 'id')->orderBy('id','ASC')->select('id', 'groups', 'call_id');
     }
 
     public function history()
