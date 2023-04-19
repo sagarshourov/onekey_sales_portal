@@ -408,7 +408,9 @@ class CallsController extends BaseController
                 $input['sections'] = 5;
             } else if (isset($input['results']) && $input['results'] == 2) {
                 $this->register_api($old_call);
-            } else if ($input['cancel_reason'] != 0) {
+            }
+
+            if ($input['cancel_reason'] != 0) {
                 $input['results'] = 1;
                 $input['sort'] =  $last->sort + 1;
             }
