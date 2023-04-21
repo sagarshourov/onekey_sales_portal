@@ -410,11 +410,7 @@ class CallsController extends BaseController
                 $this->register_api($old_call);
             }
 
-            if ($input['cancel_reason'] != 0) {
-                $input['results'] = 1;
-                $input['sort'] =  $last->sort + 1;
-            }
-
+           
 
             if (isset($input['f_results']) && $input['f_results'] == 4) {
                 $input['results'] = 3;
@@ -423,6 +419,12 @@ class CallsController extends BaseController
                 $input['results'] = 2;
                 $this->register_api($old_call);
             }
+
+             if ($input['cancel_reason'] != 0) {
+                $input['results'] = 1;
+                $input['sort'] =  $last->sort + 1;
+            }
+
 
 
             $data = Calls::updateOrCreate(
