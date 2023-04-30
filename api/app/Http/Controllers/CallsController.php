@@ -412,10 +412,13 @@ class CallsController extends BaseController
 
            
 
-            if (isset($input['f_results']) && $input['f_results'] == 4) {
-                $input['results'] = 3;
-                $input['sections'] = 5;
-            } else if (isset($input['f_results']) && $input['f_results'] == 2) {
+            // if (isset($input['f_results']) && $input['f_results'] == 4) {
+            //     $input['results'] = 3;
+            //     $input['sections'] = 5;
+            // } else
+            
+            
+            if (isset($input['f_results']) && $input['f_results'] == 2) {
                 $input['results'] = 2;
                 $this->register_api($old_call);
             }
