@@ -49,7 +49,6 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
     Route::post('read_all_noti', 'App\Http\Controllers\NotiController@read_all_noti');
 
 
-
     Route::resource('settings', SettingsController::class);
     Route::get('settings/{table}/{id}', 'App\Http\Controllers\SettingsController@destroy');
     Route::get('events', 'App\Http\Controllers\CallsController@events');
@@ -66,7 +65,7 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
 
     
 
-
+    Route::post('update_feedback', 'App\Http\Controllers\CallsController@update_feedback');
 
 
 
