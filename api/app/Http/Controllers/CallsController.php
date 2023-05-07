@@ -174,7 +174,40 @@ class CallsController extends BaseController
 
 
 
-    public function pre_filter($startDate, $endDate, $users, $type, $off, $limit,  $order)
+    public function emp_filter($startDate, $endDate,  $type, $result, $cancel, $off, $limit,  $order)
+    {
+        $user = Auth::user();
+
+        $calls = Calls::where('assigned_to',   $user->id)
+            ->whereBetween('agree_date_sent', array($startDate, $endDate))
+            ->offset($off)->limit($limit);
+        if ($type == 10) {
+            $calls->where('ag', 1);
+        } else if ($type == 11) {
+            $calls->where('agreed_to_signed', 1);
+        } else if ((int)$type != 0) {
+            $calls->where('status',  $type);
+        }
+
+
+        if ((int) $result != 0) {
+            $calls->where('results',  (int) $result);
+        }
+
+
+        if ((int) $cancel != 0) {
+            $calls->where('cancel_reason',  (int) $cancel);
+        }
+
+
+
+
+        return $this->sendResponse($calls->get(), 'Retrieve calls.');
+    }
+
+
+
+    public function pre_filter($startDate, $endDate, $users, $type,  $off, $limit,  $order)
     {
 
         if ($type == 10) {

@@ -63,12 +63,9 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
 
     Route::get('pre_filter/{startDate}/{endDate}/{users}/{type}/{off}/{limit}/{order}', 'App\Http\Controllers\CallsController@pre_filter');
 
-    
+    Route::get('emp_filter/{startDate}/{endDate}/{type}/{result}/{cancel}/{off}/{limit}/{order}', 'App\Http\Controllers\CallsController@emp_filter');
 
     Route::post('update_feedback', 'App\Http\Controllers\CallsController@update_feedback');
-
-
-
 });
 
 Route::get('whatsapp/record_history/{id}', 'App\Http\Controllers\FileController@record_history');
