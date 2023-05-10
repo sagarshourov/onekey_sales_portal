@@ -179,10 +179,9 @@ class CallsController extends BaseController
         $user = Auth::user();
 
         $calls = Calls::where('assigned_to',   $user->id)
-            ->whereBetween('agree_date_sent', array($startDate, $endDate))
             ->offset($off)->limit($limit);
         if ($type == 10) {
-            $calls->where('ag', 1);
+            $calls->where('ag', 1)->whereBetween('agree_date_sent', array($startDate, $endDate));
         } else if ($type == 11) {
             $calls->where('agreed_to_signed', 1);
         } else if ((int)$type != 0) {
@@ -190,7 +189,9 @@ class CallsController extends BaseController
         }
 
 
-        if ((int) $result != 0) {
+        if ((int) $result == 1) {
+            $calls->where('results', 1)->whereBetween('cancel_date', array($startDate, $endDate));
+        } else if ((int) $result != 0) {
             $calls->where('results',  (int) $result);
         }
 
