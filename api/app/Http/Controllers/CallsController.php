@@ -174,6 +174,32 @@ class CallsController extends BaseController
 
 
 
+    public function emp_follow_filter($startDate, $endDate, $result, $off, $limit,  $order)
+    {
+        $user = Auth::user();
+        $calls = Calls::where('assigned_to', $user->id)->offset($off)->limit($limit);
+        if ((int)$result > 0) {
+            $calls->where('f_results', $result)->whereBetween('follow_up_date', array($startDate, $endDate));
+        }
+
+        return $this->sendResponse($calls->get(), 'Retrieve calls.');
+    }
+
+
+
+    public function emp_fc_filter($startDate, $endDate, $result, $off, $limit,  $order)
+    {
+        $user = Auth::user();
+        $calls = Calls::where('assigned_to', $user->id)->offset($off)->limit($limit);
+        if ((int)$result > 0) {
+            $calls->where('f_results', $result)->whereBetween('first_contact', array($startDate, $endDate));
+        }
+
+        return $this->sendResponse($calls->get(), 'Retrieve calls.');
+    }
+
+
+
     public function emp_filter($startDate, $endDate,  $type, $result, $cancel, $off, $limit,  $order)
     {
         $user = Auth::user();
@@ -421,23 +447,50 @@ class CallsController extends BaseController
 
 
             if (isset($input['follow_up'])) {
+
                 $follow = $input['follow_up'];
-                //unset($input['follow_up']);
                 $end = end($follow);
-                $input['follow_up_date'] = $end['follow_up_date'];
-                $input['follow_up_notes'] = $end['follow_up_notes'];
-                if ($end['f_results'] == 1 && $input['cancel_reason'] != 0) {
-                    $input['results'] = 1;
-                    $input['sort'] =  $last->sort + 1;
-                    //} else if ($end['f_results'] == 2 && isset($input['f_results']) && $input['f_results'] == 2) {
-                } else if ($end['f_results'] == 2) {
-                    $input['results'] = 2;
-                    $this->register_api($old_call);
+
+                if ((int) $end['f_results'] != 0) {
+
+                    $input['follow_up_date'] = $end['follow_up_date'];
+                    $input['follow_up_notes'] = $end['follow_up_notes'];
+                    if ($end['f_results'] == 1 && $input['cancel_reason'] != 0) {
+                        $input['results'] = 1;
+                        $input['sort'] =  $last->sort + 1;
+                        //} else if ($end['f_results'] == 2 && isset($input['f_results']) && $input['f_results'] == 2) {
+                    } else if ($end['f_results'] == 2) {
+                        $input['results'] = 2;
+                        //  $this->register_api($old_call);
+                    } else {
+                        $input['results'] = (int) $end['f_results'];
+                    }
+
+
+                    $this->extra_group($input['follow_up'], 'follow_up',  $id);
+                } else {
+                    if (isset($input['f_results']) && $input['f_results'] == 4) {
+                        $input['results'] = 3;
+                        $input['sections'] = 17;
+                    } else if (isset($input['f_results']) && $input['f_results'] == 2) {
+                        $input['results'] = 2;
+                    } else {
+                        $input['results'] = $input['f_results'];
+                    }
                 }
-
-
-                $this->extra_group($input['follow_up'], 'follow_up',  $id);
+            } else {
+                if (isset($input['f_results']) && $input['f_results'] == 4) {
+                    $input['results'] = 3;
+                    $input['sections'] = 17;
+                } else if (isset($input['f_results']) && $input['f_results'] == 2) {
+                    $input['results'] = 2;
+                } else {
+                    $input['results'] = $input['f_results'];
+                }
             }
+
+
+
             isset($input['assigned_to']) &&  $this->assigned_to((int)$input['assigned_to'], (int) $old_call[0]->assigned_to, (int) $id);
             isset($input['con_gpa']) &&  $this->extra_group($input['con_gpa'], 'con_gpa',  $id);
             isset($input['suppose']) &&  $this->extra_group($input['suppose'], 'suppose', $id);
@@ -453,30 +506,33 @@ class CallsController extends BaseController
             unset($input['user_id']);
 
 
-            if (isset($input['results']) && $input['results'] == 4) {
-                $input['results'] = 3;
-                $input['sections'] = 5;
-            } else if (isset($input['results']) && $input['results'] == 2) {
-                $this->register_api($old_call);
-            }
-
-
-
-            // if (isset($input['f_results']) && $input['f_results'] == 4) {
+            // if (isset($input['results']) && $input['results'] == 4) {
             //     $input['results'] = 3;
             //     $input['sections'] = 5;
-            // } else
+            // } else 
 
-
-            if (isset($input['f_results']) && $input['f_results'] == 2) {
-                $input['results'] = 2;
-                $this->register_api($old_call);
+            if (isset($input['results']) && $input['results'] == 4) {
+                $input['sections'] = 17;
+                $input['results'] = 3;
             }
+
+
 
             if ($input['cancel_reason'] != 0) {
                 $input['results'] = 1;
                 $input['sort'] =  $last->sort + 1;
             }
+
+
+            if (isset($input['results']) && $input['results'] == 2) {
+                $this->register_api($old_call);
+            }
+
+
+            if (!isset($input['results']) || (int) $input['results'] == 0) {
+                $input['results'] = 3;
+            }
+
 
 
 

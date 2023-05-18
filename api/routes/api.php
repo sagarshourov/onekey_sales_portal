@@ -65,6 +65,14 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
 
     Route::get('emp_filter/{startDate}/{endDate}/{type}/{result}/{cancel}/{off}/{limit}/{order}', 'App\Http\Controllers\CallsController@emp_filter');
 
+    Route::get('emp_fc_filter/{startDate}/{endDate}/{result}/{off}/{limit}/{order}', 'App\Http\Controllers\CallsController@emp_fc_filter');
+
+    Route::get('emp_follow_filter/{startDate}/{endDate}/{result}/{off}/{limit}/{order}', 'App\Http\Controllers\CallsController@emp_follow_filter');
+
+    
+
+
+
     Route::post('update_feedback', 'App\Http\Controllers\CallsController@update_feedback');
 });
 
