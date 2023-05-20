@@ -16,7 +16,7 @@ class Notifications extends Model
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'type', 'content', 'is_read',  'user_id', 'call_id', 'to_id'
+        'type', 'content', 'is_read',  'user_id', 'call_id', 'to_id', 'admin_id', 'note'
     ];
 
 
