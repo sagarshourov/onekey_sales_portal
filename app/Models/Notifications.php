@@ -29,6 +29,10 @@ class Notifications extends Model
     {
         return $this->hasOne(User::class, 'id', 'user_id')->select('id', 'first_name', 'last_name');
     }
+    public function admin()
+    {
+        return $this->hasOne(User::class, 'id', 'admin_id')->select('id', 'first_name', 'last_name');
+    }
 
     public function receiver()
     {

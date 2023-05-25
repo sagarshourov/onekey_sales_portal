@@ -29,9 +29,9 @@ class NotiController extends BaseController
         $user = Auth::user();
 
         if ($user->is_admin == 1 || $user->is_admin == 2) {
-            return Notifications::where('to_id', $user->id)->orWhere('to_id', null)->with(['types', 'user', 'receiver'])->orderBy('id', 'DESC')->get();
+            return Notifications::where('to_id', $user->id)->orWhere('to_id', null)->with(['types', 'user', 'receiver', 'admin'])->orderBy('id', 'DESC')->get();
         } else {
-            return Notifications::where('to_id', $user->id)->with(['types', 'user', 'receiver'])->orderBy('id', 'DESC')->get();
+            return Notifications::where('to_id', $user->id)->with(['types', 'user', 'receiver', 'admin'])->orderBy('id', 'DESC')->get();
         }
     }
 
@@ -86,7 +86,7 @@ class NotiController extends BaseController
         $input['user_id'] =  $request->user_id;
         Notifications::create($input);
 
-        
+
         return $this->sendResponse($this->get_noti(), 'Notifications Add successfully.');
     }
 
@@ -124,12 +124,19 @@ class NotiController extends BaseController
         //
 
 
-        $noti = Notifications::where('id', (int)  $id)->update(['is_read' => $request->is_read]);
 
 
-        if ($request->type == 1) {
+        if ($request->type == 1) { // only viewed
+            $noti = Notifications::where('id', (int)  $id)->update(['is_read' => $request->is_read]);
+
+            return $this->sendResponse(array('noti' => $this->get_noti(), 'call' => Calls::withTrashed()->with(['user'])->where('id', (int)$request->call_id)->first()), 'Notifications updated  successfully.');
+        }
+        if ($request->type == 2) {  // reject 
+
+            $noti = Notifications::where('id', (int)  $id)->update(['is_read' => $request->is_read, 'note' => $request->note, 'admin_id' => $request->admin_id, 'approve' => 0]);
             return $this->sendResponse(array('noti' => $this->get_noti(), 'call' => Calls::withTrashed()->with(['user'])->where('id', (int)$request->call_id)->first()), 'Notifications updated  successfully.');
         } else {
+            $noti = Notifications::where('id', (int)  $id)->update(['is_read' => $request->is_read]);
             return $this->sendResponse(array('noti' => $this->get_noti(), 'call' => ''), 'Notifications updated successfully.');
         }
     }
@@ -138,10 +145,9 @@ class NotiController extends BaseController
 
         $noti = Notifications::where('to_id', (int)  $request->user_id)->orWhere('to_id', null)->update(['is_read' => $request->is_read]);
         return $this->sendResponse(array('noti' => $this->get_noti(), 'call' => ''), 'Notifications updated successfully.');
-
     }
 
-    
+
 
     /**
      * Remove the specified resource from storage.

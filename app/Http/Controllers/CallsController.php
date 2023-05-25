@@ -471,7 +471,7 @@ class CallsController extends BaseController
                 } else {
                     if (isset($input['f_results']) && $input['f_results'] == 4) {
                         $input['results'] = 3;
-                        $input['sections'] = 17;
+                        // $input['sections'] = 17; // instruction 20/5/2023
                     } else if (isset($input['f_results']) && $input['f_results'] == 2) {
                         $input['results'] = 2;
                     } else {
@@ -481,7 +481,7 @@ class CallsController extends BaseController
             } else {
                 if (isset($input['f_results']) && $input['f_results'] == 4) {
                     $input['results'] = 3;
-                    $input['sections'] = 17;
+                    // $input['sections'] = 17;
                 } else if (isset($input['f_results']) && $input['f_results'] == 2) {
                     $input['results'] = 2;
                 } else {
@@ -512,7 +512,7 @@ class CallsController extends BaseController
             // } else 
 
             if (isset($input['results']) && $input['results'] == 4) {
-                $input['sections'] = 17;
+                // $input['sections'] = 17;
                 $input['results'] = 3;
             }
 
@@ -564,7 +564,7 @@ class CallsController extends BaseController
 
             if ($input['f_results'] == 4) {
                 $input['results'] = 3;
-                $input['sections'] = 5;
+                //  $input['sections'] = 5;
             }
 
             // $last =  Calls::orderBy('id', 'desc')->first();
@@ -764,9 +764,9 @@ class CallsController extends BaseController
         $user = Auth::user();
 
         if ($user->is_admin == 1 || $user->is_admin == 2) {
-            return Notifications::where('to_id', $user->id)->orWhere('to_id', null)->with(['types', 'user', 'receiver'])->orderBy('id', 'DESC')->get();
+            return Notifications::where('to_id', $user->id)->orWhere('to_id', null)->with(['types', 'user', 'receiver', 'admin'])->orderBy('id', 'DESC')->get();
         } else {
-            return Notifications::where('to_id', $user->id)->with(['types', 'user', 'receiver'])->orderBy('id', 'DESC')->get();
+            return Notifications::where('to_id', $user->id)->with(['types', 'user', 'receiver', 'admin'])->orderBy('id', 'DESC')->get();
         }
     }
 
@@ -782,7 +782,15 @@ class CallsController extends BaseController
         $input['to_id'] = $receiver;
         $input['call_id'] = $call_id;
 
-        Notifications::create($input);
+        Notifications::firstOrCreate($input);
+    }
+
+
+    private function update_notification($noti_id, $admin_content, $note, $admin_id, $approve)
+    {
+
+
+        Notifications::where('id', (int)  $noti_id)->update(['is_read' => 1, 'content' => $admin_content, 'note' => $note, 'admin_id' => $admin_id, 'approve' => $approve]);
     }
 
 
@@ -796,21 +804,14 @@ class CallsController extends BaseController
                 Calls::whereIn('id', $request->ids)
                     ->update(['sections' => 5]);
             } else  if ($request->name == 'results' && $request->value == '3') { // when no answer selected its will go no open section
-
                 //   return 'update nn';
-
                 Calls::whereIn('id', $request->ids)
                     ->update(['sections' => null, 'results' => 3]);
-
-
                 foreach ($request->ids as $call_id) {
-
-
                     $ext = ExtraGroups::create([
                         'call_id' => (int) $call_id,
                         'groups' => 'follow_up'
                     ]);
-
                     ExtraValues::create([
                         'field' => 'follow_up_date',
                         'value' => date("Y-m-d"),
@@ -827,7 +828,7 @@ class CallsController extends BaseController
                         'ext_id' => $ext->id
                     ]);
                 }
-            } else  if ($request->name == 'results' && $request->value == '2') { // when no answer selected its will go no answer section
+            } else  if ($request->name == 'results' && (int) $request->value == 2) { // when no answer selected its will go no answer section
                 Calls::whereIn('id', $request->ids)
                     ->update(['sections' => null, 'results' => 2]);
                 $this->register_api(Calls::whereIn('id', $request->ids)->select('first_name', 'last_name', 'email', 'phone_number')->get());
@@ -866,7 +867,9 @@ class CallsController extends BaseController
 
                 $this->create_notification(3, $emp_content, 0, $user->id, $request->user_id, (int)  $id); //emp_notification
 
-                $this->create_notification(3, $admin_content, 0, $request->user_id, $user->id, (int)  $id); //admin_notification
+                //  $this->create_notification(3, $admin_content, 0, $request->user_id, $user->id, (int)  $id); //admin_notification
+
+                $this->update_notification($request->noti_id, $admin_content, $request->note, $request->admin_id, $request->approve);
 
                 return $this->sendResponse(array('noti' => $this->get_noti(), 'call' => Calls::withTrashed()->with(['user'])->where('id', (int) $id)->first()), 'Notifications updated  successfully.');
             } else  if ($request->name == 'results' && $request->value == '3') { // when no answer selected its will go no answer section
@@ -875,8 +878,8 @@ class CallsController extends BaseController
             } else {
 
                 if ($request->name == 'results' && $request->value == '4') { // when no answer selected its will go no answer section
-                    Calls::withTrashed()->where('id', (int)  $id)
-                        ->update(['sections' => 5]);
+                    // Calls::withTrashed()->where('id', (int)  $id)
+                    //     ->update(['sections' => 5]);
                 } else {
                     Calls::withTrashed()->where('id', (int)  $id)
                         ->update([$request->name => $request->value]);
