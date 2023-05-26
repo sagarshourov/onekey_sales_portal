@@ -497,6 +497,15 @@ class CallsController extends BaseController
             isset($input['my_step']) &&  $this->extra_group($input['my_step'], 'my_step',  $id);
 
 
+            if (isset($input['call_schedule'])) {
+                $cs = $input['call_schedule'];
+                $last_cs = end($cs);
+                $input['call_schedule_date'] = $last_cs['date'];
+                $input['call_schedule_time'] = $last_cs['time'];
+                $this->extra_group($input['call_schedule'], 'call_schedule',  $id);
+            }
+
+
             if (isset($input['feedbacks']) !== "") {
                 $this->extra_single('feedbacks', $input['feedbacks'], $input['user_id'], $input['id'], $input['assigned_to']);
             } else {
@@ -575,6 +584,14 @@ class CallsController extends BaseController
             //     $input['sections'] = null;
             // }
 
+            if (isset($input['call_schedule'])) {
+                $cs = $input['call_schedule'];
+                $last_cs = end($cs);
+                $input['call_schedule_date'] = $last_cs['date'];
+                $input['call_schedule_time'] = $last_cs['time'];
+            }
+
+
             $n = Calls::create($input);
 
             Calls::where('id', $n->id)
@@ -590,6 +607,10 @@ class CallsController extends BaseController
 
             isset($input['follow_up']) &&  $this->extra_group($input['follow_up'], 'follow_up', $n->id);
             isset($input['con_gpa']) &&  $this->extra_group($input['con_gpa'], 'con_gpa',  $n->id);
+
+            isset($input['call_schedule']) &&  $this->extra_group($input['call_schedule'], 'call_schedule',   $n->id);
+
+
 
             isset($input['suppose']) &&  $this->extra_group($input['suppose'], 'suppose', $n->id);
             isset($input['my_step']) &&  $this->extra_group($input['my_step'], 'my_step',  $n->id);
@@ -937,11 +958,19 @@ class CallsController extends BaseController
 
             //$call_ids['follow_up_date'] = Calls::where('user_id', $user->id)->get(['id', 'first_name', 'last_name', 'follow_up_date', 'call_schedule_date']);
 
-            $call_ids['fud'] = Calls::where([['assigned_to', '=', $user->id], ['follow_up_date', '!=', null]])->get(['id', 'first_name', 'last_name', 'follow_up_date', 'call_schedule_time as cst']);
+            //  $call_ids['fud'] = Calls::where([['assigned_to', '=', $user->id], ['follow_up_date', '!=', null]])->get(['id', 'first_name', 'last_name', 'follow_up_date', 'call_schedule_time as cst']);
+
+
+            $call_ids['next'] = Calls::with('steps.next')->where([['assigned_to', '=', $user->id]])->get(['id', 'first_name', 'last_name']);
+
+
+
             $call_ids['csd'] = Calls::where([['assigned_to', '=', $user->id], ['call_schedule_date', '!=', null]])->get(['id', 'first_name', 'last_name', 'call_schedule_date', 'call_schedule_time as cst']);
         } else {
-            $call_ids['fud'] = Calls::where('follow_up_date', '!=', null)->get(['id', 'first_name', 'last_name', 'follow_up_date']);
-            $call_ids['csd'] = Calls::where('follow_up_date', '!=', null)->get(['id', 'first_name', 'last_name', 'call_schedule_date']);
+            // $call_ids['fud'] = Calls::where('follow_up_date', '!=', null)->get(['id', 'first_name', 'last_name', 'follow_up_date']);
+
+            $call_ids['next'] = Calls::with('steps.next')->where([['assigned_to', '=', $user->id]])->get(['id', 'first_name', 'last_name']);
+            $call_ids['csd'] = Calls::where('call_schedule_date', '!=', null)->get(['id', 'first_name', 'last_name', 'call_schedule_date']);
         }
 
         return $this->sendResponse($call_ids, 'Events Retrieve successfully.');

@@ -18,6 +18,13 @@ class ExtraGroups extends Model
     protected $fillable = [
         'id', 'groups', 'call_id'
     ];
+
+    public function next()
+    {
+        return $this->hasMany(ExtraValues::class, 'ext_id', 'id')->select('id', 'ext_id', 'field', 'value');
+    }
+
+
     public function values()
     {
         return $this->hasMany(ExtraValues::class, 'ext_id', 'id')->select('id', 'ext_id', 'field', 'value');
@@ -27,6 +34,4 @@ class ExtraGroups extends Model
     {
         return $this->hasOne(Calls::class, 'id', 'call_id')->select('id', 'first_name', 'last_name');
     }
-
-
 }
