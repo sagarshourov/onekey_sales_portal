@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Exports;
+
 use App\Models\Calls;
 use App\Models\Results;
 use App\Models\Sections;
@@ -15,28 +17,42 @@ class CallExport implements WithMultipleSheets
 {
 
 
-    
+
     use Exportable;
 
-    protected $year;
-    
-    public function __construct(int $year)
+    protected $result;
+    protected $title;
+    protected $user_id;
+
+    public function __construct(int $result , string $title , int $user_id)
     {
-        $this->year = $year;
+        $this->result = $result;
+
+        $this->title = $title;
+        $this->user_id = $user_id;
     }
- 
- 
+
+
     /**
      * @return array
      */
     public function sheets(): array
     {
         $sheets = [];
-       $sections = Results::all();
-       $sheets[] = new InvoicesPerMonthSheet(NULL, 'Call');
-        foreach($sections as $sec){
-            $sheets[] = new InvoicesPerMonthSheet($sec->id, $sec->title);
+        $sections = Results::all();
+       // $sheets[] = new InvoicesPerMonthSheet(NULL, 'Call');
+
+
+        if($this->result==0){
+            foreach ($sections as $sec) {
+                $sheets[] = new InvoicesPerMonthSheet($sec->id, $sec->title , $this->user_id);
+            }
+        }else{
+            $sheets[] = new InvoicesPerMonthSheet($this->result, $this->title , $this->user_id);
         }
+
+
+        
         return $sheets;
     }
 }

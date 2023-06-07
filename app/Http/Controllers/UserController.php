@@ -15,8 +15,21 @@ class UserController extends BaseController
 
     public function export()
     {
-        return Excel::download(new CallExport(2023), 'users.xlsx');
+        return Excel::download(new CallExport(0, '', 0), 'users.xlsx');
     }
+
+    public function single_export($result, $title, $user_id)
+    {
+        return Excel::download(new CallExport($result, $title, $user_id), 'users.xlsx');
+    }
+
+
+
+
+
+
+
+
     // public function import() 
     // {
     //     Excel::import(new CallImport, storage_path('users.xlsx'));

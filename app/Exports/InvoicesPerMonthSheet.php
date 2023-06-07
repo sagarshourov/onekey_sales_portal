@@ -21,34 +21,43 @@ use App\Models\Sections;
 use App\Models\Status;
 
 use PhpOffice\PhpSpreadsheet\Cell\DataValidation;
-class InvoicesPerMonthSheet implements  WithTitle,FromView,WithEvents
+
+class InvoicesPerMonthSheet implements WithTitle, FromView, WithEvents
 {
     private $title;
     private $id;
+
+    private $user_id;
     protected  $selects;
-    public function __construct( $id, string $title)
+    public function __construct($id, string $title, $user_id)
     {
         $this->id = $id;
         $this->title  = $title;
+        $this->user_id  = $user_id;
 
-        $status=['active','pending','disabled'];
-        $departments=['Account','Admin','Ict','Sales'];
-        $roles=['role1','role2','role3','role4'];
-        $selects=[  //selects should have column_name and options
-            ['columns_name'=>'D','options'=>$departments],
-            ['columns_name'=>'E','options'=>$status],
-            ['columns_name'=>'F','options'=>$roles],
-        ];
-        $this->selects=$roles;
+        // $status=['active','pending','disabled'];
+        // $departments=['Account','Admin','Ict','Sales'];
+        // $roles=['role1','role2','role3','role4'];
+        // $selects=[  //selects should have column_name and options
+        //     ['columns_name'=>'D','options'=>$departments],
+        //     ['columns_name'=>'E','options'=>$status],
+        //     ['columns_name'=>'F','options'=>$roles],
+        // ];
+        // $this->selects=$roles;
 
 
     }
 
     public function view(): View
     {
-        $calls = Calls::where('results', $this->id)->get()->groupBy('sections');
+        if ($this->user_id == 0) {
+            $calls = Calls::with('extra.values')->where('results', $this->id)->get()->groupBy('sections');
+        } else {
+            $calls = Calls::with('extra.values')->where(['results' => $this->id, 'assigned_to' => $this->user_id])->get()->groupBy('sections');
+        }
 
-        return view('call_view',[
+
+        return view('call_view', [
             'calls' => $calls,
             'section' => Sections::all(),
             'package' => Package::all(),
@@ -56,7 +65,7 @@ class InvoicesPerMonthSheet implements  WithTitle,FromView,WithEvents
 
         ]);
     }
-  
+
 
     /**
      * @return string
@@ -88,8 +97,4 @@ class InvoicesPerMonthSheet implements  WithTitle,FromView,WithEvents
             // },
         ];
     }
-
-
-
-
 }

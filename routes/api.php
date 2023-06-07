@@ -77,7 +77,8 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
 });
 
 Route::get('whatsapp/record_history/{id}', 'App\Http\Controllers\FileController@record_history');
-Route::get('call/export/', [UserController::class, 'export']);
+Route::get('call/export', [UserController::class, 'export']);
+Route::get('single_export/{result}/{title}/{user_id}', [UserController::class, 'single_export']);
 
 
 

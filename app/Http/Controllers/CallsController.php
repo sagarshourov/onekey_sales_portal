@@ -977,9 +977,9 @@ class CallsController extends BaseController
     }
 
 
-    public function call_export()
+    public function call_export(Request $request)
     {
-        $calls = Calls::where('results', null)->get()->groupBy('sections');
+        $calls = Calls::where('results', $request->result)->get()->groupBy('sections');
 
         return view('call_view', [
             'calls' => $calls,
