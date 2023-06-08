@@ -23,12 +23,14 @@ if(!function_exists('extra_title')){
         if ($arr->extra && count($arr->extra) > 0) {
 
 
-        foreach($arr->extra as $index => $dat){
+     foreach($arr->extra as $ind => $dat){
+
+   
             if ($dat->groups == $group && $dat->values[$index]->value) {
-            $value = $dat->values[$index]->value;
+                $value = $dat->values[$index]->value;
             }
 
-        }
+        } 
 
 
 
@@ -162,7 +164,7 @@ if(!function_exists('extra_title')){
 
             <td> {{extra_title($call,'my_step',0)}}</td>
 
-            <td></td>
+            <td>{{extra_title($call,'my_step',1)}}</td>
 
 
             <td>

@@ -87,3 +87,4 @@ Route::post('register_api', [CallsController::class, 'register_api']);
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
 // });
+Route::get('call_export', 'App\Http\Controllers\CallsController@call_export');
