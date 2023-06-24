@@ -492,6 +492,7 @@ class CallsController extends BaseController
 
 
             isset($input['assigned_to']) &&  $this->assigned_to((int)$input['assigned_to'], (int) $old_call[0]->assigned_to, (int) $id);
+            
             isset($input['con_gpa']) &&  $this->extra_group($input['con_gpa'], 'con_gpa',  $id);
             isset($input['suppose']) &&  $this->extra_group($input['suppose'], 'suppose', $id);
             isset($input['my_step']) &&  $this->extra_group($input['my_step'], 'my_step',  $id);
@@ -506,7 +507,7 @@ class CallsController extends BaseController
             }
 
 
-            if (isset($input['feedbacks']) !== "") {
+            if (isset($input['feedbacks']) !== "" && isset($input['assigned_to'])) {
                 $this->extra_single('feedbacks', $input['feedbacks'], $input['user_id'], $input['id'], $input['assigned_to']);
             } else {
                 unset($input['feedbacks']);
