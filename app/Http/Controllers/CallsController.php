@@ -15,6 +15,8 @@ use App\Models\Package;
 use App\Models\Sections;
 use App\Models\Status;
 use App\Models\Notifications;
+use App\Models\CallHistory;
+
 
 use Illuminate\Support\Facades\Http;
 
@@ -62,7 +64,7 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            return Calls::where('assigned_to', $user->id)->WhereIn('results', [2, 3])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'ASC')->get();
+            return Calls::where('assigned_to', $user->id)->WhereIn('results', [2, 3])->with(['extra.values',  'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'ASC')->get();
         } else {
             return Calls::where('results', 3)->orWhere('results', 2)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'ASC')->get();
         }
@@ -426,6 +428,60 @@ class CallsController extends BaseController
 
 
 
+    private static function udiffAssoc(array $array1, array $array2, $user_id, $id)
+    {
+
+
+        $in = array();
+
+        foreach ($array1 as $key => $value) {
+
+            if (!is_array($value) && $key != "user_id") {
+                $in[$key] =  $value;
+            }
+        }
+
+
+
+
+        $checkDiff = function ($a, $b) use (&$checkDiff) {
+            //return -1; 
+            if (is_array($a) && is_array($b)) {
+                // return array_udiff_assoc($a, $b, $checkDiff);
+                return -1;
+            } elseif (is_array($a)) {
+                return -1;
+            } elseif (is_array($b)) {
+                return -1;
+            } elseif ($a == $b) {
+                return 0;
+            } else {
+                return -1;
+                // return $a > $b ? 1 : -1;
+            }
+        };
+        $diff = array_udiff_assoc($in, $array2, $checkDiff);
+
+        if (count($diff) > 0) {
+
+
+
+            $inp['data'] = json_encode($diff);
+            $inp['user_id'] = $user_id;
+            $inp['call_id'] = $id;
+            CallHistory::create($inp);
+
+            return  $inp;
+        }
+    }
+
+
+
+
+
+
+
+
 
     /**
      * Store a newly created resource in storage.
@@ -445,6 +501,18 @@ class CallsController extends BaseController
 
             $old_call = Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number', 'assigned_to')->get();
 
+
+            //   $arr_call = Calls::with(['my_step', 'call_schedule', 'con_gpa', 'follow_up'])->where('id', $id)->first()->toArray();
+
+            $arr_call = Calls::where('id', $id)->first()->toArray();
+
+
+            $this->udiffAssoc($input, $arr_call, $input['user_id'], $id);
+
+
+            //$diff = array_diff(array_map('serialize', $input), array_map('serialize', $arr_call));
+            //return array_map('unserialize', $diff);
+            // return $this->sendResponse($old_call->toArray(), 'Calls add  successfully.');
 
             if (isset($input['follow_up'])) {
 
@@ -492,7 +560,7 @@ class CallsController extends BaseController
 
 
             isset($input['assigned_to']) &&  $this->assigned_to((int)$input['assigned_to'], (int) $old_call[0]->assigned_to, (int) $id);
-            
+
             isset($input['con_gpa']) &&  $this->extra_group($input['con_gpa'], 'con_gpa',  $id);
             isset($input['suppose']) &&  $this->extra_group($input['suppose'], 'suppose', $id);
             isset($input['my_step']) &&  $this->extra_group($input['my_step'], 'my_step',  $id);
@@ -635,7 +703,7 @@ class CallsController extends BaseController
     public function show($id)
     {
         //
-        $call =  Calls::where('id', $id)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->first();
+        $call =  Calls::where('id', $id)->with(['extra.values', 'versions.user', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->first();
 
         return $this->sendResponse($call, 'Single Call retrieve successfully.');
     }

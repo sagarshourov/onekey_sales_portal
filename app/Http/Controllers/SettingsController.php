@@ -14,6 +14,10 @@ use App\Models\Status;
 use App\Models\Priority;
 use App\Models\User;
 use App\Models\WantToStudy;
+
+use App\Models\EngTest;
+
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -43,7 +47,7 @@ class SettingsController extends BaseController
 
         $re['payment_method'] = PaymentMethod::get(['id', 'title']);
 
-
+        $re['eng_test'] = EngTest::get(['id', 'title']);
 
 
 

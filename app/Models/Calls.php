@@ -21,6 +21,36 @@ class Calls extends Model
     ];
 
 
+    public function versions()
+    {
+        return $this->hasMany(CallHistory::class, 'call_id', 'id');
+    }
+
+
+    public function call_schedule()
+    {
+        return $this->hasMany(ExtraGroups::class, 'call_id', 'id')->where('groups','call_schedule')->orderBy('id','DESC')->select('id', 'groups', 'call_id');
+    }
+    public function my_step()
+    {
+        return $this->hasMany(ExtraGroups::class, 'call_id', 'id')->where('groups','my_step')->orderBy('id','DESC')->select('id', 'groups', 'call_id');
+    }
+
+    public function con_gpa()
+    {
+        return $this->hasMany(ExtraGroups::class, 'call_id', 'id')->where('groups','con_gpa')->orderBy('id','DESC')->select('id', 'groups', 'call_id');
+    }
+    public function follow_up()
+    {
+        return $this->hasMany(ExtraGroups::class, 'call_id', 'id')->where('groups','follow_up')->orderBy('id','DESC')->select('id', 'groups', 'call_id');
+    }
+
+    
+
+    
+
+
+
     public function steps()
     {
         return $this->hasOne(ExtraGroups::class, 'call_id', 'id')->where('groups','my_step')->orderBy('id','DESC')->select('id', 'groups', 'call_id');
