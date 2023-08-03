@@ -36,6 +36,8 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
     Route::get('call_filter/{user_id}/{results}/{value}/{off}/{limit}/{search}/{order}', 'App\Http\Controllers\CallsController@filter');
 
     Route::post('calls_sort', 'App\Http\Controllers\CallsController@calls_sort');
+    Route::post('users_sort', 'App\Http\Controllers\UserController@users_sort');
+     
 
     Route::post('file_upload', 'App\Http\Controllers\FileController@file_upload');
     Route::get('check/{field}/{value}', 'App\Http\Controllers\CallsController@check');

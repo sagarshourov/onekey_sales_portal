@@ -23,6 +23,17 @@ class UserController extends BaseController
         return Excel::download(new CallExport($result, $title, $user_id), 'users.xlsx');
     }
 
+    public function users_sort(Request $request)
+    {
+        $all = $request->all();
+
+        foreach ($all['sort'] as $key => $val) {
+            User::where('id', $val)
+                ->update(['sort' => $key+1]);
+        }
+        return $this->sendResponse([], 'Users short successfully.');
+    }
+
 
 
 
@@ -65,7 +76,7 @@ class UserController extends BaseController
 
     private function users()
     {
-        $users = User::with(['profile'])->get();
+        $users = User::with(['profile'])->orderBy('sort', 'ASC')->get();
         return $users;
     }
 
