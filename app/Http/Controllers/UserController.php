@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 use App\Models\User;
+use App\Models\AssignEmployee;
+
+
 use App\Exports\CallExport;
 
 use Maatwebsite\Excel\Facades\Excel;
@@ -29,10 +32,56 @@ class UserController extends BaseController
 
         foreach ($all['sort'] as $key => $val) {
             User::where('id', $val)
-                ->update(['sort' => $key+1]);
+                ->update(['sort' => $key + 1]);
         }
         return $this->sendResponse([], 'Users short successfully.');
     }
+
+    public function assign_employee(Request $request)
+    {
+        $input = $request->all();
+
+        if (count($input['data'])  > 0) {
+
+            foreach ($input['data'] as $user_id) {
+                AssignEmployee::create([
+                    'admin_id' => $input['user_id'],
+                    'user_id' => $user_id,
+                ]);
+            }
+        } else {
+            return $this->sendError($request->all(), 'Something wrong.');
+        }
+        return $this->sendResponse($request->all(), 'Admin retrieved successfully.');
+    }
+
+
+    public function get_assign_employee($id)
+    {
+        // $users =  AdminUsers::with(['user'])->where('admin_id', 1)->orderByDesc('id')->get();
+
+        $users =  AssignEmployee::with('users')->where('admin_id', $id)->orderByDesc('id')->get();
+        return $this->sendResponse($users, 'Users retrieved successfully.');
+    }
+
+
+    public function del_assign_employee(Request $request)
+    {
+        $input = $request->all();
+
+
+        AssignEmployee::where(['admin_id' => $input['admin_id'], 'user_id' => $input['user_id']])->forceDelete();
+
+        return $this->sendResponse(['success'], 'Users retrieved successfully.');
+    }
+
+
+
+
+
+
+
+
 
 
 

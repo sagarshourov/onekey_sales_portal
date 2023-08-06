@@ -37,7 +37,14 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
 
     Route::post('calls_sort', 'App\Http\Controllers\CallsController@calls_sort');
     Route::post('users_sort', 'App\Http\Controllers\UserController@users_sort');
-     
+
+    Route::post('assign_employee', 'App\Http\Controllers\UserController@assign_employee');
+
+    Route::get('assign_employee/{id}', 'App\Http\Controllers\UserController@get_assign_employee');
+
+    Route::post('del_assign_employee', 'App\Http\Controllers\UserController@del_assign_employee');
+
+    
 
     Route::post('file_upload', 'App\Http\Controllers\FileController@file_upload');
     Route::get('check/{field}/{value}', 'App\Http\Controllers\CallsController@check');
@@ -62,7 +69,6 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
 
     Route::get('reports/{emp_id}/{off}', 'App\Http\Controllers\CallsController@reports');
 
-
     Route::get('pre_filter/{startDate}/{endDate}/{users}/{type}/{off}/{limit}/{order}', 'App\Http\Controllers\CallsController@pre_filter');
 
     Route::get('emp_filter/{startDate}/{endDate}/{type}/{result}/{cancel}/{off}/{limit}/{order}', 'App\Http\Controllers\CallsController@emp_filter');
@@ -70,10 +76,6 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
     Route::get('emp_fc_filter/{startDate}/{endDate}/{result}/{off}/{limit}/{order}', 'App\Http\Controllers\CallsController@emp_fc_filter');
 
     Route::get('emp_follow_filter/{startDate}/{endDate}/{result}/{off}/{limit}/{order}', 'App\Http\Controllers\CallsController@emp_follow_filter');
-
-    
-
-
 
     Route::post('update_feedback', 'App\Http\Controllers\CallsController@update_feedback');
 });
