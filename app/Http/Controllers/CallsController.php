@@ -152,7 +152,7 @@ class CallsController extends BaseController
             } else if ($field == 'sections' && $search != '0') {
                 return Calls::WhereIn('assigned_to', $emp)->where('email', 'like', '%' . $query . '%')->with($with)->get();
             } else {
-                return Calls::WhereIn('assigned_to', $emp)->where([$field, '=',  $null], ['email', 'like', '%' . $query . '%'])->with($with)->get();
+                return Calls::WhereIn('assigned_to', $emp)->where([[$field, '=',  $null], ['email', 'like', '%' . $query . '%']])->with($with)->get();
             }
         } else if ($user->is_admin && $user->is_admin == 3) {
             // return Calls::where(['assigned_to' => $user->id, $field => $value])->with($with)->orderBy('id', 'DESC')->offset($off)->limit($limit)->get();
@@ -163,19 +163,19 @@ class CallsController extends BaseController
                 // return $field.'='.$null;
                 //  return Calls::where([$field, '=',  $null], ['assigned_to', '=', $user->id])->get();
 
-                return Calls::where(['assigned_to', '=', $user->id], [$field, '=',  $null])->with($with)->orderBy('sort', $order)->offset($off)->limit($limit)->get();
+                return Calls::where([['assigned_to', '=', $user->id], [$field, '=',  $null]])->with($with)->orderBy('sort', $order)->offset($off)->limit($limit)->get();
             } else if ($field == 'sections' && $search != '0') {
-                return Calls::where(['assigned_to', '=', $user->id], ['email', 'like', '%' . $query . '%'])->with($with)->get();
+                return Calls::where([['assigned_to', '=', $user->id], ['email', 'like', '%' . $query . '%']])->with($with)->get();
             } else {
-                return Calls::where(['assigned_to', '=', $user->id], [$field, '=',  $null], ['email', 'like', '%' . $query . '%'])->with($with)->get();
+                return Calls::where([['assigned_to', '=', $user->id], [$field, '=',  $null], ['email', 'like', '%' . $query . '%']])->with($with)->get();
             }
         } else if ($user_id != 0) {
             if ($search == '0') {
-                return Calls::where(['assigned_to', '=', $user_id], [$field, '=',  $null])->with($with)->orderBy('sort', $order)->offset($off)->limit($limit)->get();
+                return Calls::where([['assigned_to', '=', $user_id], [$field, '=',  $null]])->with($with)->orderBy('sort', $order)->offset($off)->limit($limit)->get();
             } else if ($field == 'sections' && $search != '0') {
                 return Calls::where('email', 'like', '%' . $query . '%')->with($with)->get();
             } else {
-                return Calls::where(['assigned_to', '=', $user_id], [$field, '=',  $null], ['email', 'like', '%' . $query . '%'])->with($with)->get();
+                return Calls::where([['assigned_to', '=', $user_id], [$field, '=',  $null], ['email', 'like', '%' . $query . '%']])->with($with)->get();
             }
         } else {
 
@@ -1100,7 +1100,7 @@ class CallsController extends BaseController
 
 
 
-            $call_ids['csd'] = Calls::where(['assigned_to', '=', $user->id], ['call_schedule_date', '!=', null])->get(['id', 'first_name', 'last_name', 'call_schedule_date', 'call_schedule_time as cst']);
+            $call_ids['csd'] = Calls::where([['assigned_to', '=', $user->id], ['call_schedule_date', '!=', null]])->get(['id', 'first_name', 'last_name', 'call_schedule_date', 'call_schedule_time as cst']);
         } else {
             // $call_ids['fud'] = Calls::where('follow_up_date', '!=', null)->get(['id', 'first_name', 'last_name', 'follow_up_date']);
 
