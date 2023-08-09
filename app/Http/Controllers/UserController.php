@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\AssignEmployee;
 
@@ -125,7 +125,17 @@ class UserController extends BaseController
 
     private function users()
     {
-        $users = User::with(['profile'])->orderBy('sort', 'ASC')->get();
+        $user = Auth::user();
+
+        if ($user->is_admin == 4) {
+
+            $emp = AssignEmployee::where('admin_id', $user->id)->pluck('user_id')->toArray();;
+            $users = User::WhereIn('id', $emp)->with(['profile'])->orderBy('sort', 'ASC')->get();
+        } else {
+            $users = User::with(['profile'])->orderBy('sort', 'ASC')->get();
+        }
+
+
         return $users;
     }
 

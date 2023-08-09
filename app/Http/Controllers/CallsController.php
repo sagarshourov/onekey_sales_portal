@@ -150,9 +150,9 @@ class CallsController extends BaseController
             if ($search == '0') {
                 return Calls::WhereIn('assigned_to', $emp)->where($field, '=', $null)->with($with)->orderBy('sort', $order)->offset($off)->limit($limit)->get();
             } else if ($field == 'sections' && $search != '0') {
-                return Calls::WhereIn('assigned_to', $emp)->where('email', 'like', '%' . $query . '%')->with($with)->get();
+                return Calls::WhereIn('assigned_to', $emp)->where('email', 'like', '%' . $query . '%')->OrWhere('first_name', 'like', '%' . $query . '%')->OrWhere('last_name', 'like', '%' . $query . '%')->with($with)->get();
             } else {
-                return Calls::WhereIn('assigned_to', $emp)->where([[$field, '=',  $null], ['email', 'like', '%' . $query . '%']])->with($with)->get();
+                return Calls::WhereIn('assigned_to', $emp)->where([[$field, '=',  $null], ['email', 'like', '%' . $query . '%']])->OrWhere('email', 'like', '%' . $query . '%')->OrWhere('first_name', 'like', '%' . $query . '%')->with($with)->get();
             }
         } else if ($user->is_admin && $user->is_admin == 3) {
             // return Calls::where(['assigned_to' => $user->id, $field => $value])->with($with)->orderBy('id', 'DESC')->offset($off)->limit($limit)->get();
@@ -165,15 +165,15 @@ class CallsController extends BaseController
 
                 return Calls::where([['assigned_to', '=', $user->id], [$field, '=',  $null]])->with($with)->orderBy('sort', $order)->offset($off)->limit($limit)->get();
             } else if ($field == 'sections' && $search != '0') {
-                return Calls::where([['assigned_to', '=', $user->id], ['email', 'like', '%' . $query . '%']])->with($with)->get();
+                return Calls::where('assigned_to', '=', $user->id)->OrWhere('email', 'like', '%' . $query . '%')->OrWhere('first_name', 'like', '%' . $query . '%')->OrWhere('last_name', 'like', '%' . $query . '%')->with($with)->get();
             } else {
-                return Calls::where([['assigned_to', '=', $user->id], [$field, '=',  $null], ['email', 'like', '%' . $query . '%']])->with($with)->get();
+                return Calls::where([['assigned_to', '=', $user->id], [$field, '=',  $null], ['email', 'like', '%' . $query . '%']])->OrWhere('first_name', 'like', '%' . $query . '%')->with($with)->get();
             }
         } else if ($user_id != 0) {
             if ($search == '0') {
                 return Calls::where([['assigned_to', '=', $user_id], [$field, '=',  $null]])->with($with)->orderBy('sort', $order)->offset($off)->limit($limit)->get();
             } else if ($field == 'sections' && $search != '0') {
-                return Calls::where('email', 'like', '%' . $query . '%')->with($with)->get();
+                return Calls::where('email', 'like', '%' . $query . '%')->OrWhere('first_name', 'like', '%' . $query . '%')->OrWhere('last_name', 'like', '%' . $query . '%')->with($with)->get();
             } else {
                 return Calls::where([['assigned_to', '=', $user_id], [$field, '=',  $null], ['email', 'like', '%' . $query . '%']])->with($with)->get();
             }
@@ -182,9 +182,10 @@ class CallsController extends BaseController
             if ($search == '0') {
                 return Calls::where($field,  $null)->with($with)->orderBy('sort', $order)->offset($off)->limit($limit)->get();
             } else if ($field == 'sections' && $search != '0') {
-                return Calls::where('email', 'like', '%' . $query . '%')->with($with)->get();
+               
+                return Calls::where('email', 'like', '%' . $query . '%')->OrWhere('first_name', 'like', '%' . $query . '%')->OrWhere('last_name', 'like', '%' . $query . '%')->with($with)->get();
             } else {
-                return Calls::where([$field, '=',  $null], ['email', 'like', '%' . $query . '%'])->with($with)->get();
+                return Calls::where([[$field, '=',  $null], ['email', 'like', '%' . $query . '%']])->OrWhere('first_name', 'like', '%' . $query . '%')->with($with)->get();
             }
         }
     }
