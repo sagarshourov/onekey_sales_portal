@@ -130,6 +130,7 @@ class UserController extends BaseController
         if ($user->is_admin == 4) {
 
             $emp = AssignEmployee::where('admin_id', $user->id)->pluck('user_id')->toArray();;
+            $emp[] = $user->id;
             $users = User::WhereIn('id', $emp)->with(['profile'])->orderBy('sort', 'ASC')->get();
         } else {
             $users = User::with(['profile'])->orderBy('sort', 'ASC')->get();
