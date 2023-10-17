@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\CallImport;
+use App\Imports\SingleSheetImport;
+
+
 use App\Models\AssignEmployee;
 use App\Models\Package;
 use App\Models\Sections;
@@ -70,7 +73,17 @@ class CallsController extends BaseController
 
             $emp = AssignEmployee::where('admin_id', $user->id)->pluck('user_id')->toArray();;
             $emp[] = $user->id;
-            return Calls::WhereIn('assigned_to', $emp)->with(['extra.values',  'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'ASC')->get();
+
+            return  Calls::WhereIn('assigned_to', $emp)
+                ->where(function ($q) {
+                    $q->WhereIn('results', [2, 3]);
+                })->with(['extra.values',  'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'ASC')->get();
+
+
+
+
+
+            //  return Calls::WhereIn('assigned_to', $emp)->with(['extra.values',  'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'ASC')->get();
 
             // return $emp;
         } else {
@@ -129,7 +142,7 @@ class CallsController extends BaseController
         if ($search == '0') {
             $query = '';
         } else {
-            $query = $search;
+            $query = trim($search);
         }
 
         $with = array('extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user');
@@ -151,8 +164,15 @@ class CallsController extends BaseController
                 return Calls::WhereIn('assigned_to', $emp)->where($field, '=', $null)->with($with)->orderBy('sort', $order)->offset($off)->limit($limit)->get();
             } else if ($field == 'sections' && $search != '0') {
                 return Calls::WhereIn('assigned_to', $emp)->where('email', 'like', '%' . $query . '%')->OrWhere('first_name', 'like', '%' . $query . '%')->OrWhere('last_name', 'like', '%' . $query . '%')->with($with)->get();
-            } else {
-                return Calls::WhereIn('assigned_to', $emp)->where([[$field, '=',  $null], ['email', 'like', '%' . $query . '%']])->OrWhere('email', 'like', '%' . $query . '%')->OrWhere('first_name', 'like', '%' . $query . '%')->with($with)->get();
+            } {
+
+                return  Calls::WhereIn('assigned_to', $emp)
+                    ->where(function ($q) use ($field, $null, $query) {
+                        $q->where([[$field, '=',  $null], ['email', 'like', '%' . $query . '%']])->OrWhere([[$field, '=',  $null], ['first_name', 'like', '%' . $query . '%']]);
+                    })
+                    ->with($with)
+                    ->get();
+                //  return Calls::WhereIn('assigned_to', $emp)->where([[$field, '=',  $null], ['email', 'like', '%' . $query . '%'], ['first_name', 'like', '%' . $query . '%']])->with($with)->get();
             }
         } else if ($user->is_admin && $user->is_admin == 3) {
             // return Calls::where(['assigned_to' => $user->id, $field => $value])->with($with)->orderBy('id', 'DESC')->offset($off)->limit($limit)->get();
@@ -167,7 +187,7 @@ class CallsController extends BaseController
             } else if ($field == 'sections' && $search != '0') {
                 return Calls::where('assigned_to', '=', $user->id)->OrWhere('email', 'like', '%' . $query . '%')->OrWhere('first_name', 'like', '%' . $query . '%')->OrWhere('last_name', 'like', '%' . $query . '%')->with($with)->get();
             } else {
-                return Calls::where([['assigned_to', '=', $user->id], [$field, '=',  $null], ['email', 'like', '%' . $query . '%']])->OrWhere('first_name', 'like', '%' . $query . '%')->with($with)->get();
+                return Calls::where([['assigned_to', '=', $user->id], [$field, '=',  $null], ['email', 'like', '%' . $query . '%']])->OrWhere([['assigned_to', '=', $user->id], [$field, '=',  $null], ['first_name', 'like', '%' . $query . '%']])->with($with)->get();
             }
         } else if ($user_id != 0) {
             if ($search == '0') {
@@ -185,7 +205,7 @@ class CallsController extends BaseController
 
                 return Calls::where('email', 'like', '%' . $query . '%')->OrWhere('first_name', 'like', '%' . $query . '%')->OrWhere('last_name', 'like', '%' . $query . '%')->with($with)->get();
             } else {
-                return Calls::where([[$field, '=',  $null], ['email', 'like', '%' . $query . '%']])->OrWhere('first_name', 'like', '%' . $query . '%')->with($with)->get();
+                return Calls::where([[$field, '=',  $null], ['email', 'like', '%' . $query . '%']])->OrWhere([[$field, '=',  $null], ['first_name', 'like', '%' . $query . '%']])->with($with)->get();
             }
         }
     }
@@ -767,9 +787,9 @@ class CallsController extends BaseController
 
         //
         $call =  Calls::where('id', $id)->with(['extra.values', 'versions.user', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->first();
-       // return $this->sendResponse($call, 'Single Call retrieve successfully.');
+        // return $this->sendResponse($call, 'Single Call retrieve successfully.');
 
-        if ($user->is_admin == 3 && $call->assigned_to && $user->id == $call->assigned_to) {
+        if ($user->is_admin == 3 && isset($call->assigned_to) && $user->id == $call->assigned_to) {
             return $this->sendResponse($call, 'Single Call retrieve successfully.');
         } else if ($user->is_admin == 1 || $user->is_admin == 2) {
             return $this->sendResponse($call, 'Single Call retrieve successfully.');
@@ -777,7 +797,7 @@ class CallsController extends BaseController
 
             $emp = AssignEmployee::where('admin_id', $user->id)->pluck('user_id')->toArray();;
             $emp[] = $user->id;
-          //  return $this->sendResponse($emp, 'Emp Call retrieve successfully.');
+            //  return $this->sendResponse($emp, 'Emp Call retrieve successfully.');
             if (isset($call->assigned_to) && in_array($call->assigned_to, $emp)) {
                 return $this->sendResponse($call, 'Supervisor  Call retrieve successfully.');
             }
@@ -959,7 +979,6 @@ class CallsController extends BaseController
     private function update_notification($noti_id, $admin_content, $note, $admin_id, $approve)
     {
 
-
         Notifications::where('id', (int)  $noti_id)->update(['is_read' => 1, 'content' => $admin_content, 'note' => $note, 'admin_id' => $admin_id, 'approve' => $approve]);
     }
 
@@ -1108,9 +1127,15 @@ class CallsController extends BaseController
 
             $emp[] = $user->id;
 
-            $call_ids['next'] = Calls::WhereIn('assigned_to', $emp)->with('steps.next')->get(['id', 'first_name', 'last_name','assigned_to']);
+            $call_ids['next'] = Calls::WhereIn('assigned_to', $emp)->with('steps.next')->get(['id', 'first_name', 'last_name', 'assigned_to']);
 
-            $call_ids['csd'] = Calls::WhereIn('assigned_to', $emp)->where('call_schedule_date', '!=', null)->get(['id', 'first_name', 'last_name', 'call_schedule_date', 'call_schedule_time as cst','assigned_to']);
+            // $call_ids['csd'] = Calls::WhereIn('assigned_to', $emp)->where('call_schedule_date', '!=', null)->get(['id', 'first_name', 'last_name', 'call_schedule_date', 'call_schedule_time as cst', 'assigned_to']);
+
+            $call_ids['csd'] =  Calls::WhereIn('assigned_to', $emp)
+                ->where(function ($q) {
+                    $q->where('call_schedule_date', '!=', null);
+                })
+                ->get(['id', 'first_name', 'last_name', 'call_schedule_date', 'call_schedule_time as cst', 'assigned_to']);
         } else if ($user->is_admin == 3) {
 
             //$call_ids['follow_up_date'] = Calls::where('user_id', $user->id)->get(['id', 'first_name', 'last_name', 'follow_up_date', 'call_schedule_date']);
@@ -1166,6 +1191,23 @@ class CallsController extends BaseController
 
             Excel::import(
                 new CallImport($request->user_id, $file_name),
+                $request->file_path
+            );
+
+
+            return $this->sendResponse([], 'File Imported successfully.');
+        }
+    }
+
+    public function singleImport(Request $request)
+    {
+
+        if ($request->user_id !== 0) {
+
+            $file_name = $this->clean($request->file_name);
+
+            Excel::import(
+                new SingleSheetImport($request->user_id, $request->file_name, $request->type),
                 $request->file_path
             );
 

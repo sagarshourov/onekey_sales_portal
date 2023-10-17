@@ -7,13 +7,13 @@ function get_title_id($data,$id){
 
 
 
-foreach($data as $array){
-if ($array['id'] == $id)
-return $array['title'];
-}
-return '';
+    foreach($data as $array){
+        if ($array['id'] == $id)
+            return $array['title'];
+        }
+        return '';
 
-}
+    }
 }
 
 if(!function_exists('extra_title')){

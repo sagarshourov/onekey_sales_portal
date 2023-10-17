@@ -36,7 +36,7 @@ class SingleSheetImport implements ToCollection
 
         // echo '<br/>';
 
-        if (preg_match('(Installment|Agreement|Signed|Did|Promotions|Promotion|More section)', $title)) {
+        if (preg_match('(Installment|Instalment|Agreement|Signed|Did|Done|Seminar|Promotions|Promotion)', $title)) {
             // echo $title;
             // echo '<br/>';
             $pkg =  Sections::firstOrCreate([
@@ -47,8 +47,10 @@ class SingleSheetImport implements ToCollection
 
             return $pkg->id;
         } else  if (preg_match('(Non Section)', $title)) {
+            $this->sections = null;
             return null;
         }
+        $this->sections = null;
         return $this->sections;
     }
 
