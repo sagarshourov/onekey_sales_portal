@@ -212,10 +212,63 @@ class CallsController extends BaseController
 
 
 
-
-    public function filter($user_id, $field, $value, $off, $limit, $search, $order)
+    private function cancel_filter($user_id, $field, $value, $startDate, $endDate, $off, $limit, $search, $order)
     {
-        $filter = $this->get_filter_cal($user_id, $field, $value, $off, $limit, $search, $order);
+
+        $user = Auth::user();
+
+        $auth_id = $user->id;
+
+
+
+
+        $query = '';
+        if ($search == '0') {
+            $query = '';
+        } else {
+            $query = trim($search);
+        }
+
+        $with = array('extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user');
+
+        $null = $value;
+        if ($value == 'null') $null = NULL;
+
+
+        $que = Calls::whereBetween('cancel_date', array($startDate, $endDate));
+
+        if ($user->is_admin && $user->is_admin == 4) { // supervisor
+            $emp = AssignEmployee::where('admin_id', $user->id)->pluck('user_id')->toArray();;
+            $emp[] = $user->id;
+            $que->WhereIn('assigned_to', $emp);
+        } else if ($user->is_admin && $user->is_admin == 3) { //employee
+
+            $que->where('assigned_to', '=', $auth_id);
+        } else if ($user_id != 0) {
+            $que->where('assigned_to', '=', $user_id);
+        }
+
+
+        $que->where(function ($q) use ($field, $null, $query) {
+            $q->where([[$field, '=',  $null], ['email', 'like', '%' . $query . '%']])
+                ->OrWhere([[$field, '=',  $null], ['first_name', 'like', '%' . $query . '%']]);
+        })->with($with)->orderBy('sort', $order)->offset($off)->limit($limit)->get();
+
+
+        return    $que->with($with)->orderBy('sort', $order)->offset($off)->limit($limit)->get();
+    }
+
+
+
+
+    public function filter($user_id, $field, $value, $startDate, $endDate, $off, $limit, $search, $order)
+    {
+        if ($value == 1) {
+            $filter = $this->cancel_filter($user_id, $field, $value, $startDate, $endDate, $off, $limit, $search, $order);
+        } else {
+            $filter = $this->get_filter_cal($user_id, $field, $value, $off, $limit, $search, $order);
+        }
+
 
 
         return $this->sendResponse($filter, 'Retrieve calls.');

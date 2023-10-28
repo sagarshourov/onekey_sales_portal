@@ -31,9 +31,9 @@ Route::get('calls_sorts', 'App\Http\Controllers\CallsController@calls_sorts');
 
 Route::resource('whatsapp', WaController::class);
 Route::post('record_upload', 'App\Http\Controllers\FileController@record_upload');
-Route::get('call_filter/{results}/{value}/{off}/{limit}/{search}/{order}', 'App\Http\Controllers\CallsController@filter');
+//Route::get('call_filter/{results}/{value}/{startDate}/{endDate}/{off}/{limit}/{search?}/{order}', 'App\Http\Controllers\CallsController@filter');
 Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"], function () {
-    Route::get('call_filter/{user_id}/{results}/{value}/{off}/{limit}/{search}/{order}', 'App\Http\Controllers\CallsController@filter');
+    Route::get('call_filter/{user_id}/{results}/{value}/{startDate}/{endDate}/{off}/{limit}/{search?}/{order}', 'App\Http\Controllers\CallsController@filter');
 
     Route::post('calls_sort', 'App\Http\Controllers\CallsController@calls_sort');
     Route::post('users_sort', 'App\Http\Controllers\UserController@users_sort');
