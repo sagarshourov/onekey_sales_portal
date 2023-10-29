@@ -222,10 +222,10 @@ class CallsController extends BaseController
 
 
 
-       
+
         $with = array('extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user');
 
-       
+
 
         $que = Calls::where('results', '=', 1);
 
@@ -627,24 +627,15 @@ class CallsController extends BaseController
         $last = Calls::latest()->first();
         //
         $input = $request->all();
-        // return $this->sendResponse($input, 'Calls add  successfully.');
+
         if (isset($input['id'])) {
             $id =  $input['id'];
 
             $old_call = Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number', 'assigned_to')->get();
 
-
-            //   $arr_call = Calls::with(['my_step', 'call_schedule', 'con_gpa', 'follow_up'])->where('id', $id)->first()->toArray();
-
             $arr_call = Calls::where('id', $id)->first()->toArray();
 
-
-            $this->udiffAssoc($input, $arr_call, $input['user_id'], $id);
-
-
-            //$diff = array_diff(array_map('serialize', $input), array_map('serialize', $arr_call));
-            //return array_map('unserialize', $diff);
-            // return $this->sendResponse($old_call->toArray(), 'Calls add  successfully.');
+            $this->udiffAssoc($input, $arr_call, $input['user_id'], $id); // MAKE HISTORY
 
             if (isset($input['follow_up'])) {
 
@@ -655,18 +646,22 @@ class CallsController extends BaseController
 
                     $input['follow_up_date'] = $end['follow_up_date'];
                     $input['follow_up_notes'] = $end['follow_up_notes'];
-                    if ($end['f_results'] == 1 && $input['cancel_reason'] != 0) {
-                        $input['results'] = 1;
-                        $input['sort'] =  $last->sort + 1;
-                        //} else if ($end['f_results'] == 2 && isset($input['f_results']) && $input['f_results'] == 2) {
-                    } else if ($end['f_results'] == 2) {
-                        $input['results'] = 2;
-                        //  $this->register_api($old_call);
-                    } else {
-                        $input['results'] = (int) $end['f_results'];
-                    }
+                    $input['results'] = (int) $end['f_results'];
+
+                    // if ($end['f_results'] == 3 && $input['cancel_reason'] != 0) { 
+                    //     $input['cancel_reason']=0;
+                    // }
 
 
+                    // if ($end['f_results'] == 1 && $input['cancel_reason'] != 0) {  //GO TO CANCEL
+                    //     $input['results'] = 1;
+                    //     // $input['sort'] =  $last->sort + 1; //COMMENTED ON 29.10.23
+
+                    // } else if ($end['f_results'] == 2) {
+                    //     $input['results'] = 2;
+                    // } else {
+                    //     $input['results'] = (int) $end['f_results'];
+                    // }
                     $this->extra_group($input['follow_up'], 'follow_up',  $id);
                 } else {
                     if (isset($input['f_results']) && $input['f_results'] == 4) {
@@ -707,7 +702,7 @@ class CallsController extends BaseController
             }
 
 
-            if (isset($input['feedbacks']) !== "" && isset($input['assigned_to'])) {
+            if (isset($input['feedbacks']) !== "" && isset($input['assigned_to'])) { // FEEDBACK INSERTED
                 $this->extra_single('feedbacks', $input['feedbacks'], $input['user_id'], $input['id'], $input['assigned_to']);
             } else {
                 unset($input['feedbacks']);
@@ -716,10 +711,6 @@ class CallsController extends BaseController
             unset($input['user_id']);
 
 
-            // if (isset($input['results']) && $input['results'] == 4) {
-            //     $input['results'] = 3;
-            //     $input['sections'] = 5;
-            // } else 
 
             if (isset($input['results']) && $input['results'] == 4) {
                 // $input['sections'] = 17;
@@ -728,10 +719,16 @@ class CallsController extends BaseController
 
 
 
-            if ($input['cancel_reason'] != 0) {
+            if ($input['cancel_reason'] != 0) { //GO TO CANCEL
                 $input['results'] = 1;
-                $input['sort'] =  $last->sort + 1;
+                //  $input['sort'] =  $last->sort + 1;  //COMMENTED ON 29.10.23 
+            } else if ($input['cancel_reason'] == 0 &&  $input['results'] = 1) {
+
+                $input['cancel_reason'] =  10;
             }
+
+
+
 
 
             if (isset($input['results']) && $input['results'] == 2) {
@@ -743,6 +740,11 @@ class CallsController extends BaseController
                 $input['results'] = 3;
             }
 
+            if (isset($input['cancel']) && $input['cancel'] == 'true') {
+                $input['results'] = 1;
+            } else if (isset($input['cancel']) && $input['cancel'] == 'false') {
+                unset($input['results']);
+            }
 
 
 
