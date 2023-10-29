@@ -68,7 +68,7 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            return Calls::where('assigned_to', $user->id)->WhereIn('results', [2, 3])->with(['extra.values',  'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user','p_sort'])->orderBy('sort', 'ASC')->get();
+            return Calls::where('assigned_to', $user->id)->WhereIn('results', [2, 3])->with(['extra.values',  'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user', 'p_sort'])->orderBy('sort', 'ASC')->get();
         } else if ($user->is_admin == 4) {
 
             $emp = AssignEmployee::where('admin_id', $user->id)->pluck('user_id')->toArray();;
@@ -77,7 +77,7 @@ class CallsController extends BaseController
             return  Calls::WhereIn('assigned_to', $emp)
                 ->where(function ($q) {
                     $q->WhereIn('results', [2, 3]);
-                })->with(['extra.values',  'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user','p_sort'])->orderBy('p_sort', 'DESC')->get();
+                })->with(['extra.values',  'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user', 'p_sort'])->orderBy('sort', 'ASC')->get();
 
 
 
@@ -87,7 +87,7 @@ class CallsController extends BaseController
 
             // return $emp;
         } else {
-            return Calls::where('results', 3)->orWhere('results', 2)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user','p_sort'])->orderBy('p_sort', 'DESC')->get();
+            return Calls::where('results', 3)->orWhere('results', 2)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user', 'p_sort'])->orderBy('sort', 'ASC')->get();
         }
     }
     private function get_Cancel_calls()
@@ -222,20 +222,18 @@ class CallsController extends BaseController
 
 
 
-        $query = '';
-        if ($search == '0') {
-            $query = '';
-        } else {
-            $query = trim($search);
-        }
-
+       
         $with = array('extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user');
 
-        $null = $value;
-        if ($value == 'null') $null = NULL;
+       
+
+        $que = Calls::where('results', '=', 1);
+
+        if ($startDate != 'null' || $endDate != 'null') {
+            $que = Calls::whereBetween('cancel_date', array($startDate, $endDate));
+        }
 
 
-        $que = Calls::whereBetween('cancel_date', array($startDate, $endDate));
 
         if ($user->is_admin && $user->is_admin == 4) { // supervisor
             $emp = AssignEmployee::where('admin_id', $user->id)->pluck('user_id')->toArray();;
@@ -247,12 +245,14 @@ class CallsController extends BaseController
         } else if ($user_id != 0) {
             $que->where('assigned_to', '=', $user_id);
         }
-
-
-        $que->where(function ($q) use ($field, $null, $query) {
-            $q->where([[$field, '=',  $null], ['email', 'like', '%' . $query . '%']])
-                ->OrWhere([[$field, '=',  $null], ['first_name', 'like', '%' . $query . '%']]);
-        })->with($with)->orderBy('sort', $order)->offset($off)->limit($limit)->get();
+        if ($search != '0') { // search value
+            $query = trim($search);
+            $que->where(function ($q) use ($query) {
+                $q->where('email', 'like', '%' . $query . '%')
+                    ->OrWhere('first_name', 'like', '%' . $query . '%')
+                    ->OrWhere('last_name', 'like', '%' . $query . '%');
+            });
+        }
 
 
         return    $que->with($with)->orderBy('sort', $order)->offset($off)->limit($limit)->get();
