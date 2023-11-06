@@ -646,8 +646,9 @@ class CallsController extends BaseController
 
                     $input['follow_up_date'] = $end['follow_up_date'];
                     $input['follow_up_notes'] = $end['follow_up_notes'];
-                    $input['results'] = (int) $end['f_results'];
 
+                    $input['results'] =  $end['f_results'];
+                    //return $this->sendResponse($input, 'Call Update successfully.');
                     // if ($end['f_results'] == 3 && $input['cancel_reason'] != 0) { 
                     //     $input['cancel_reason']=0;
                     // }
@@ -664,22 +665,22 @@ class CallsController extends BaseController
                     // }
                     $this->extra_group($input['follow_up'], 'follow_up',  $id);
                 } else {
-                    if (isset($input['f_results']) && $input['f_results'] == 4) {
+                    if (isset($input['f_results']) && (int) $input['f_results'] == 4) {
                         $input['results'] = 3;
                         // $input['sections'] = 17; // instruction 20/5/2023
-                    } else if (isset($input['f_results']) && $input['f_results'] == 2) {
+                    } else if (isset($input['f_results']) && (int) $input['f_results'] == 2) {
                         $input['results'] = 2;
-                    } else {
+                    } else if (isset($input['f_results']) && $input['f_results'] != '1') {
                         $input['results'] = $input['f_results'];
                     }
                 }
             } else {
-                if (isset($input['f_results']) && $input['f_results'] == 4) {
+                if (isset($input['f_results']) && (int)  $input['f_results'] == 4) {
                     $input['results'] = 3;
                     // $input['sections'] = 17;
-                } else if (isset($input['f_results']) && $input['f_results'] == 2) {
+                } else if (isset($input['f_results']) && (int)  $input['f_results'] == 2) {
                     $input['results'] = 2;
-                } else {
+                } else if (isset($input['f_results']) && $input['f_results'] != '1') {
                     $input['results'] = $input['f_results'];
                 }
             }
@@ -719,10 +720,10 @@ class CallsController extends BaseController
 
 
 
-            if ($input['cancel_reason'] != 0) { //GO TO CANCEL
+            if ($input['cancel_reason'] != '0') { //GO TO CANCEL
                 $input['results'] = 1;
                 //  $input['sort'] =  $last->sort + 1;  //COMMENTED ON 29.10.23 
-            } else if ($input['cancel_reason'] == 0 &&  $input['results'] = 1) {
+            } else if ($input['cancel_reason'] == '0' && isset($input['results']) &&  $input['results'] == 1) {
 
                 $input['cancel_reason'] =  10;
             }
@@ -740,11 +741,12 @@ class CallsController extends BaseController
                 $input['results'] = 3;
             }
 
-            if (isset($input['cancel']) && $input['cancel'] == 'true') {
-                $input['results'] = 1;
-            } else if (isset($input['cancel']) && $input['cancel'] == 'false') {
-                unset($input['results']);
-            }
+            // if (isset($input['cancel']) && $input['cancel'] == 'true') {
+            //     $input['results'] = 1;
+            // } else if (isset($input['cancel']) && $input['cancel'] == 'false') {
+            //     unset($input['results']);
+
+            // }
 
 
 
@@ -1050,7 +1052,7 @@ class CallsController extends BaseController
             } else  if ($request->name == 'results' && $request->value == '3') { // when no answer selected its will go no open section
                 //   return 'update nn';
                 Calls::whereIn('id', $request->ids)
-                    ->update(['sections' => null, 'results' => 3]);
+                    ->update(['sections' => null, 'cancel_reason' => null, 'cancel_date' => null, 'cancel_note' => null, 'results' => 3]);
                 foreach ($request->ids as $call_id) {
                     $ext = ExtraGroups::create([
                         'call_id' => (int) $call_id,
@@ -1118,7 +1120,7 @@ class CallsController extends BaseController
                 return $this->sendResponse(array('noti' => $this->get_noti(), 'call' => Calls::withTrashed()->with(['user'])->where('id', (int) $id)->first()), 'Notifications updated  successfully.');
             } else  if ($request->name == 'results' && $request->value == '3') { // when no answer selected its will go no answer section
                 Calls::where('id', (int)  $id)
-                    ->update(['sections' => null, 'results' => 3]);
+                    ->update(['sections' => null, 'cancel_reason' => null, 'cancel_date' => null, 'cancel_note' => null, 'results' => 3]);
             } else {
 
                 if ($request->name == 'results' && $request->value == '4') { // when no answer selected its will go no answer section
