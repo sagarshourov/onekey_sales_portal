@@ -546,6 +546,11 @@ class CallsController extends BaseController
         if ($assign_to != $old_assign) {
 
             $this->create_call_extra('assigned_to', 'Assign To', $assign_to, $call_id);
+
+            $emp_content = 'You have assigned new call !';
+        
+
+            $this->create_notification(2, $emp_content, 0, $old_assign, $assign_to, (int)  $call_id); 
         }
     }
 
@@ -826,7 +831,7 @@ class CallsController extends BaseController
             }
 
 
-            return $this->sendResponse($this->get_calls(), 'Calls add successfully.');
+            return $this->sendResponse($this->get_calls(), $n->id);
         }
     }
 

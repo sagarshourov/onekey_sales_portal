@@ -133,7 +133,7 @@ class NotiController extends BaseController
         }
         if ($request->type == 2) {  // reject 
 
-            $noti = Notifications::where('id', (int)  $id)->update(['is_read' => $request->is_read, 'note' => $request->note, 'admin_id' => $request->admin_id, 'approve' => 0]);
+            $noti = Notifications::where('id', (int)  $id)->update(['is_read' => $request->is_read, 'content'=>'The transfer was rejected', 'note' => $request->note, 'admin_id' => $request->admin_id, 'approve' => 0]);
             return $this->sendResponse(array('noti' => $this->get_noti(), 'call' => Calls::withTrashed()->with(['user'])->where('id', (int)$request->call_id)->first()), 'Notifications updated  successfully.');
         } else {
             $noti = Notifications::where('id', (int)  $id)->update(['is_read' => $request->is_read]);
