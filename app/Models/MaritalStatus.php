@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class MaritalStatus extends Model 
+class MaritalStatus extends Model
 {
 
     protected $table = 'marital_status';
@@ -14,5 +14,7 @@ class MaritalStatus extends Model
     use SoftDeletes;
 
     protected $dates = ['deleted_at'];
+
+
 
 }

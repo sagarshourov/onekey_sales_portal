@@ -9,6 +9,7 @@ use App\Http\Controllers\NotiController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\WaController;
 
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -44,8 +45,6 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
 
     Route::post('del_assign_employee', 'App\Http\Controllers\UserController@del_assign_employee');
 
-    
-
     Route::post('file_upload', 'App\Http\Controllers\FileController@file_upload');
     Route::get('check/{field}/{value}', 'App\Http\Controllers\CallsController@check');
     Route::get('userinfo/{id}', 'App\Http\Controllers\AuthController@userinfo');
@@ -79,6 +78,8 @@ Route::group(["prefix" => "admin", 'middleware' => 'auth:api', "name" => "admin"
     Route::get('emp_follow_filter/{startDate}/{endDate}/{result}/{off}/{limit}/{order}', 'App\Http\Controllers\CallsController@emp_follow_filter');
 
     Route::post('update_feedback', 'App\Http\Controllers\CallsController@update_feedback');
+
+    Route::get('dashboard/{team}/{sdate}/{edate}', 'App\Http\Controllers\DashboardController@index');
 });
 
 Route::get('whatsapp/record_history/{id}', 'App\Http\Controllers\FileController@record_history');

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Package extends Model 
+class Package extends Model
 {
 
     protected $table = 'packages';
@@ -16,7 +16,12 @@ class Package extends Model
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'id','title'
+        'id', 'title'
     ];
 
+
+    public function Calls()
+    {
+        return $this->hasMany(Calls::class, 'package', 'id');
+    }
 }

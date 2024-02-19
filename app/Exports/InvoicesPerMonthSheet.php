@@ -29,11 +29,13 @@ class InvoicesPerMonthSheet implements WithTitle, FromView, WithEvents
 
     private $user_id;
     protected  $selects;
-    public function __construct($id, string $title, $user_id)
+    protected  $off;
+    public function __construct($id, string $title, $user_id, $off)
     {
         $this->id = $id;
         $this->title  = $title;
         $this->user_id  = $user_id;
+        $this->off  = $off;
 
         // $status=['active','pending','disabled'];
         // $departments=['Account','Admin','Ict','Sales'];
@@ -51,9 +53,12 @@ class InvoicesPerMonthSheet implements WithTitle, FromView, WithEvents
     public function view(): View
     {
         if ($this->user_id == 0) {
-            $calls = Calls::with('extra.values')->where('results', $this->id)->get()->groupBy('sections');
+            $calls = Calls::with('extra.values')->where('results', $this->id)->skip($this->off)->take(10000)->get()->groupBy('sections');
+            //  ->offset($off)->limit(20)
         } else {
-            $calls = Calls::with('extra.values')->where(['results' => $this->id, 'assigned_to' => $this->user_id])->get()->groupBy('sections');
+            //$calls = Calls::with('extra.values')->where(['results' => $this->id, 'assigned_to' => $this->user_id])->get()->groupBy('sections');
+
+            $calls = Calls::with('extra.values')->where('results', $this->id)->offset($this->off)->limit(10000)->get()->groupBy('sections');
         }
 
 

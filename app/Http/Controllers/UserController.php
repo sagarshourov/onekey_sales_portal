@@ -10,20 +10,68 @@ use App\Models\AssignEmployee;
 
 
 use App\Exports\CallExport;
-
+use App\Models\Calls;
 use Maatwebsite\Excel\Facades\Excel;
-
+use Illuminate\Support\Facades\Storage;
+use ZipArchive;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
 class UserController extends BaseController
 {
 
     public function export()
     {
-        return Excel::download(new CallExport(0, '', 0), 'users.xlsx');
+
+        $calls_count = Calls::count();
+
+        $num = $calls_count / 10000;
+
+        $filePaths = array();
+
+        for ($a = 0; $a <= $num; $a++) {
+
+            $file_name = 'users' . time() . $a . '.xlsx';
+
+            $filePaths[] =  $file_name;
+
+            Excel::store(new CallExport(0, '', 0, $a + 1), $file_name);
+
+            // return Excel::download(new CallExport(0, '', 0, $a), 'users.xlsx');
+        }
+        // return response()->download(storage_path('app/' . 'users1.xlsx'))->deleteFileAfterSend(true);
+
+
+        $currentDate = Carbon::now()->format('Y-m-d');
+        $zipFileName =  $currentDate . '_files.zip';
+        $zip = new ZipArchive();
+        if ($zip->open(public_path($zipFileName), ZipArchive::CREATE | ZipArchive::OVERWRITE)) {
+            foreach ($filePaths as $filePath) {
+                $file = Storage::path($filePath);
+                $fileName = basename($file);
+                $zip->addFile($file, $fileName);
+
+                //  echo    $file;
+            }
+            $zip->close();
+        }
+
+        foreach ($filePaths as $filePath) {
+
+
+           // Storage::delete('app/' .$filePath);
+
+            File::delete(storage_path('app/' .$filePath));
+
+            //  echo    $file;
+        }
+
+
+        return response()->download(public_path($zipFileName))->deleteFileAfterSend(true);
     }
 
     public function single_export($result, $title, $user_id)
     {
-        return Excel::download(new CallExport($result, $title, $user_id), 'users.xlsx');
+        return Excel::download(new CallExport($result, $title, $user_id, 1), 'users.xlsx');
     }
 
     public function users_sort(Request $request)

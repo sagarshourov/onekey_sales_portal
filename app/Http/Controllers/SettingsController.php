@@ -30,7 +30,7 @@ class SettingsController extends BaseController
         $re['sections'] = Sections::orderBy('sort', 'ASC')->get(['id', 'title', 'theme', 'start_date', 'end_date', 'sort']);
 
         $re['cancel_reason'] = CancelReason::get(['id', 'title']);
-        $re['packages'] = Package::get(['id', 'title']);
+        $re['packages'] = Package::get(['id', 'title', 'value']);
         $re['status'] = Status::get(['id', 'title']);
         $re['results'] = Results::get(['id', 'title']);
         $re['priorities'] = Priority::get(['id', 'title']);

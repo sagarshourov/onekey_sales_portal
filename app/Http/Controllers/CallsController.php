@@ -68,7 +68,7 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            return Calls::where('assigned_to', $user->id)->WhereIn('results', [2, 3])->with(['extra.values',  'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user', 'p_sort'])->orderBy('sort', 'ASC')->get();
+            return Calls::where('assigned_to', $user->id)->WhereIn('results', [1, 2, 3])->with(['extra.values',  'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user', 'p_sort'])->orderBy('sort', 'ASC')->get();
         } else if ($user->is_admin == 4) {
 
             $emp = AssignEmployee::where('admin_id', $user->id)->pluck('user_id')->toArray();;
@@ -76,18 +76,15 @@ class CallsController extends BaseController
 
             return  Calls::WhereIn('assigned_to', $emp)
                 ->where(function ($q) {
-                    $q->WhereIn('results', [2, 3]);
+                    $q->WhereIn('results', [1, 2, 3]);
                 })->with(['extra.values',  'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user', 'p_sort'])->orderBy('sort', 'ASC')->get();
-
-
-
 
 
             //  return Calls::WhereIn('assigned_to', $emp)->with(['extra.values',  'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user'])->orderBy('sort', 'ASC')->get();
 
             // return $emp;
         } else {
-            return Calls::where('results', 3)->orWhere('results', 2)->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user', 'p_sort'])->orderBy('sort', 'ASC')->get();
+            return Calls::WhereIn('results', [2, 3])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user', 'p_sort'])->orderBy('sort', 'ASC')->get();
         }
     }
     private function get_Cancel_calls()
@@ -548,9 +545,9 @@ class CallsController extends BaseController
             $this->create_call_extra('assigned_to', 'Assign To', $assign_to, $call_id);
 
             $emp_content = 'You have assigned new call !';
-        
 
-            $this->create_notification(2, $emp_content, 0, $old_assign, $assign_to, (int)  $call_id); 
+
+            $this->create_notification(2, $emp_content, 0, $old_assign, $assign_to, (int)  $call_id);
         }
     }
 
@@ -633,10 +630,31 @@ class CallsController extends BaseController
         //
         $input = $request->all();
 
+
+  
+
         if (isset($input['id'])) {
             $id =  $input['id'];
 
             $old_call = Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number', 'assigned_to')->get();
+
+            if (isset($old_call[0]->email) && $old_call[0]->email !== '') {
+                unset($input['email']);
+            } else if ($input['email'] != '') {
+                $messages = [
+                    'unique' => 'taken',
+                ];
+                $validator = Validator::make($input, [
+                    'email' => 'required|email|regex:/(.+)@(.+)\.(.+)/i|unique:calls',
+                ],  $messages);
+                if ($validator->fails()) {
+                    $call =  Calls::withTrashed()->where('email', $input['email'])->first();
+                    return $this->sendError($validator->errors(), $call);
+                    //return $this->sendError('Validation Error.', $validator->errors());
+                }
+            }
+
+
 
             $arr_call = Calls::where('id', $id)->first()->toArray();
 
@@ -679,6 +697,7 @@ class CallsController extends BaseController
                         $input['results'] = $input['f_results'];
                     }
                 }
+                unset($input['follow_up']);
             } else {
                 if (isset($input['f_results']) && (int)  $input['f_results'] == 4) {
                     $input['results'] = 3;
@@ -694,9 +713,24 @@ class CallsController extends BaseController
 
             isset($input['assigned_to']) &&  $this->assigned_to((int)$input['assigned_to'], (int) $old_call[0]->assigned_to, (int) $id);
 
-            isset($input['con_gpa']) &&  $this->extra_group($input['con_gpa'], 'con_gpa',  $id);
-            isset($input['suppose']) &&  $this->extra_group($input['suppose'], 'suppose', $id);
-            isset($input['my_step']) &&  $this->extra_group($input['my_step'], 'my_step',  $id);
+            if (isset($input['con_gpa'])) {
+                $this->extra_group($input['con_gpa'], 'con_gpa',  $id);
+                unset($input['con_gpa']);
+            }
+
+            if (isset($input['suppose'])) {
+                $this->extra_group($input['suppose'], 'suppose', $id);
+                unset($input['suppose']);
+            }
+
+            if (isset($input['my_step'])) {
+                $this->extra_group($input['my_step'], 'my_step', $id);
+                unset($input['my_step']);
+            }
+
+
+
+          
 
 
             if (isset($input['call_schedule'])) {
@@ -705,6 +739,8 @@ class CallsController extends BaseController
                 $input['call_schedule_date'] = $last_cs['date'];
                 $input['call_schedule_time'] = $last_cs['time'];
                 $this->extra_group($input['call_schedule'], 'call_schedule',  $id);
+
+                unset($input['call_schedule']);
             }
 
 
@@ -754,11 +790,10 @@ class CallsController extends BaseController
             // }
 
 
+           // return $input;
 
-            $data = Calls::updateOrCreate(
-                ['id' =>  (int) $id],
-                $input
-            );
+            $data =  Calls::where('id', (int) $id)
+                ->update($input);
 
             //  $this->extra_insert($input, array('note', 'last_status_notes'));
             return $this->sendResponse($this->get_calls(), 'Call Update successfully.');

@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Passport\HasApiTokens;
 
+use App\Models\Calls;
+
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
@@ -50,6 +52,11 @@ class User extends Authenticatable
 
     public function profile()
     {
-        return $this->hasOne(Files::class, 'user_id', 'id')->select('id','user_id', 'file_path');
+        return $this->hasOne(Files::class, 'user_id', 'id')->select('id', 'user_id', 'file_path');
+    }
+
+    public function calls()
+    {
+        return $this->hasMany(Calls::class);
     }
 }

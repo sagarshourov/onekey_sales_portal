@@ -7,42 +7,42 @@ function get_title_id($data,$id){
 
 
 
-    foreach($data as $array){
-        if ($array['id'] == $id)
-            return $array['title'];
-        }
-        return '';
+foreach($data as $array){
+if ($array['id'] == $id)
+return $array['title'];
+}
+return '';
 
-    }
+}
 }
 
 if(!function_exists('extra_title')){
 
-    function extra_title($arr, $group, $index) {
-        $value = "";
-        if ($arr->extra && count($arr->extra) > 0) {
+function extra_title($arr, $group, $index) {
+$value = "";
+if (isset($arr->extra) && count($arr->extra) > 0) {
 
 
-     foreach($arr->extra as $ind => $dat){
-
-   
-            if ($dat->groups == $group && $dat->values[$index]->value) {
-                $value = $dat->values[$index]->value;
-            }
-
-        } 
+foreach($arr->extra as $ind => $dat){
 
 
+if ($dat->groups == $group && $dat->values[$index]->value) {
+$value = $dat->values[$index]->value;
+}
 
-        }
-
-        if ($index === 0 && $value != "") {
-        return date('j F, Y', strtotime($value));
-        }
+}
 
 
-        return $value;
-    }
+
+}
+
+if ($index === 0 && $value != "") {
+return date('j F, Y', strtotime($value));
+}
+
+
+return $value;
+}
 
 }
 
@@ -85,55 +85,78 @@ if(!function_exists('extra_title')){
         </tr>
     </thead>
     <tbody>
-        @foreach($calls as $key=>$call)
+        @foreach($calls as $key => $cal)
         <tr>
             <td colspan="18" style="background-color: #FFFF00; height : 20px; padding:5em; text-align : center">
                 {{get_title_id($section,$key)}}
 
             </td>
         </tr>
-        @foreach($call as $call)
+        @foreach($cal as $call)
         <tr>
             <td>
+                @isset($call->first_name)
                 {{$call->first_name}}
+                @endisset
+                @isset($call->last_name)
                 {{$call->last_name}}
-
-            </td>
-
-            <td>
-                {{$call->email}}
-
-            </td>
-            <td>
-                {{$call->priority}}
-
-            </td>
-            <td>
-                {{$call->whatsapp}}
-
-            </td>
-
-            <td>
-                {{$call->age}}
-
+                @endisset
             </td>
 
             <td>
 
+
+                @isset($call->email)
+                {{ $call->email }}
+                @endisset
+
+            </td>
+            <td>
+
+
+                @isset($call->priority)
+                {{ $call->priority }}
+                @endisset
+
+            </td>
+            <td>
+
+
+                @isset($call->whatsapp)
+                {{ $call->whatsapp }}
+                @endisset
+
+            </td>
+
+            <td>
+
+
+                @isset($call->age)
+                {{ $call->age }}
+                @endisset
+
+            </td>
+
+            <td>
+                @isset($call->call_schedule_date)
                 {{ $call->call_schedule_date ? date('j F, Y', strtotime($call->call_schedule_date)) : "" }}
 
-
+                @endisset
 
             </td>
             <td>
+                @isset($call->case_type)
                 {{$call->case_type==1?'F-1':'F-1/F2'}}
+                @endisset
 
             </td>
             <td>
 
-
-
+                @isset($call->first_contact)
                 {{ $call->first_contact ? date('j F, Y', strtotime($call->first_contact)) : "" }}
+                @endisset
+
+
 
             </td>
 
@@ -141,26 +164,45 @@ if(!function_exists('extra_title')){
             <td>
 
 
-                {{$call->first_call_notes}}
+
+
+                @isset($call->first_call_notes)
+                {{ $call->first_call_notes }}
+                @endisset
 
 
 
             </td>
 
             <td>
+                @isset($call->package)
                 {{get_title_id($package,$call->package)}}
+                @endisset
+
+
 
             </td>
             <td>
+                @isset($call->ag)
                 {{$call->ag==0?'No':'Yes'}}
+                @endisset
 
             </td>
             <td>
+                @isset($call->agreed_to_signed)
                 {{$call->agreed_to_signed==0?'No':'Yes'}}
+                @endisset
 
             </td>
 
-            <td>{{get_title_id($status,$call->status)}}</td>
+            <td>
+
+                @isset($call->status)
+                {{get_title_id($status,$call->status)}}
+                @endisset
+
+
+            </td>
 
             <td> {{extra_title($call,'my_step',0)}}</td>
 
@@ -169,18 +211,28 @@ if(!function_exists('extra_title')){
 
             <td>
 
-
+                @isset($call->follow_up_date)
                 {{ $call->follow_up_date ? date('j F, Y', strtotime($call->follow_up_date)) : "" }}
 
-            </td>
-
-            <td>
-                {{$call->follow_up_notes}}
+                @endisset
 
             </td>
 
             <td>
-                {{$call->feedbacks}}
+
+
+                @isset($call->follow_up_notes)
+                {{ $call->follow_up_notes }}
+                @endisset
+
+            </td>
+
+            <td>
+
+
+                @isset($call->feedbacks)
+                {{ $call->feedbacks }}
+                @endisset
             </td>
 
 

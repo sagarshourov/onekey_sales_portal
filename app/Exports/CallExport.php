@@ -23,13 +23,15 @@ class CallExport implements WithMultipleSheets
     protected $result;
     protected $title;
     protected $user_id;
+    protected $off;
 
-    public function __construct(int $result , string $title , int $user_id)
+    public function __construct(int $result, string $title, int $user_id, $off)
     {
         $this->result = $result;
 
         $this->title = $title;
         $this->user_id = $user_id;
+        $this->off = $off;
     }
 
 
@@ -40,19 +42,19 @@ class CallExport implements WithMultipleSheets
     {
         $sheets = [];
         $sections = Results::all();
-       // $sheets[] = new InvoicesPerMonthSheet(NULL, 'Call');
+        // $sheets[] = new InvoicesPerMonthSheet(NULL, 'Call');
 
 
-        if($this->result==0){
+        if ($this->result == 0) {
             foreach ($sections as $sec) {
-                $sheets[] = new InvoicesPerMonthSheet($sec->id, $sec->title , $this->user_id);
+                $sheets[] = new InvoicesPerMonthSheet($sec->id, $sec->title, $this->user_id, $this->off);
             }
-        }else{
-            $sheets[] = new InvoicesPerMonthSheet($this->result, $this->title , $this->user_id);
+        } else {
+            $sheets[] = new InvoicesPerMonthSheet($this->result, $this->title, $this->user_id, $this->off);
         }
 
 
-        
+
         return $sheets;
     }
 }
