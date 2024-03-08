@@ -1,5 +1,7 @@
 @php
 
+
+
 if(!function_exists('get_title_id')){
 
 
@@ -56,8 +58,15 @@ return $value;
             <th style="background-color:  #333cff; color:white;">Client</th>
             <th style="background-color:  #333cff; color:white;">Email</th>
 
-            <th style="background-color:  #333cff; color:white;">Priority</th>
 
+
+            <th style="background-color:  #333cff; color:white;">Cancel Date</th>
+
+            <th style="background-color:  #333cff; color:white;">Reason</th>
+
+            <th style="background-color:  #333cff; color:white;">Assigned To </th>
+
+            <th style="background-color:  #333cff; color:white;">Priority</th>
 
             <th style="background-color:  #333cff; color:white;">WhatsApp</th>
             <th style="background-color:  #333cff; color:white;">Age</th>
@@ -111,9 +120,29 @@ return $value;
                 @endisset
 
             </td>
+
             <td>
+                @isset($call->cancel_date)
+                {{ $call->cancel_date }}
+                @endisset
+
+            </td>
+            <td>
+                @isset($call->cancelReason)
+                {{ $call->cancelReason->title }}
+                @endisset
+
+            </td>
+            <td>
+                @isset($call->assignedTo)
+                {{ $call->assignedTo->first_name }}
+                {{ $call->assignedTo->last_name }}
+                @endisset
+
+            </td>
 
 
+            <td>
                 @isset($call->priority)
                 {{ $call->priority }}
                 @endisset

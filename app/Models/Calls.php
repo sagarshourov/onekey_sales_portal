@@ -113,6 +113,11 @@ class Calls extends Model
 
         return $this->hasOne(CancelReason::class, 'id', 'cancel_reason')->select('id', 'title');
     }
+    public function cancelReason()
+    {
+
+        return $this->hasOne(CancelReason::class, 'id', 'cancel_reason')->select('id', 'title');
+    }
 
     public function user()
     {
@@ -138,6 +143,11 @@ class Calls extends Model
     public function want_to_study()
     {
         return $this->hasOne(WantToStudy::class, 'id', 'want_to_study')->select('id', 'title');
+    }
+
+    public function assignedTo()
+    {
+        return $this->hasOne(User::class, 'id', 'assigned_to')->select('id', 'first_name', 'last_name', 'team');
     }
 
     public function assigned_to()

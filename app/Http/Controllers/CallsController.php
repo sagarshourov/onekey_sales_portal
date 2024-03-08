@@ -631,7 +631,7 @@ class CallsController extends BaseController
         $input = $request->all();
 
 
-  
+
 
         if (isset($input['id'])) {
             $id =  $input['id'];
@@ -730,7 +730,7 @@ class CallsController extends BaseController
 
 
 
-          
+
 
 
             if (isset($input['call_schedule'])) {
@@ -790,7 +790,7 @@ class CallsController extends BaseController
             // }
 
 
-           // return $input;
+            // return $input;
 
             $data =  Calls::where('id', (int) $id)
                 ->update($input);
@@ -1258,8 +1258,8 @@ class CallsController extends BaseController
 
     public function call_export(Request $request)
     {
-        $calls = Calls::where('results', $request->result)->get()->groupBy('sections');
-
+        $calls = Calls::with('extra.values', 'assignedTo', 'cancelReason')->where('results', 1)->offset(1)->limit(1)->get()->groupBy('sections');
+        // print_r($calls);
         return view('call_view', [
             'calls' => $calls,
             'section' => Sections::all(),

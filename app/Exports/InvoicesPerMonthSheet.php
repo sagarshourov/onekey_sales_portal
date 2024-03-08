@@ -53,12 +53,12 @@ class InvoicesPerMonthSheet implements WithTitle, FromView, WithEvents
     public function view(): View
     {
         if ($this->user_id == 0) {
-            $calls = Calls::with('extra.values')->where('results', $this->id)->skip($this->off)->take(10000)->get()->groupBy('sections');
+            $calls = Calls::with('extra.values', 'assignedTo', 'cancelReason')->where('results', $this->id)->skip($this->off)->take(10000)->get()->groupBy('sections');
             //  ->offset($off)->limit(20)
         } else {
             //$calls = Calls::with('extra.values')->where(['results' => $this->id, 'assigned_to' => $this->user_id])->get()->groupBy('sections');
 
-            $calls = Calls::with('extra.values')->where('results', $this->id)->offset($this->off)->limit(10000)->get()->groupBy('sections');
+            $calls = Calls::with('extra.values', 'assignedTo', 'cancelReason')->where('results', $this->id)->skip($this->off)->take(10000)->get()->groupBy('sections');
         }
 
 
