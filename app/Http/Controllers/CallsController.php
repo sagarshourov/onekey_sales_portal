@@ -68,7 +68,7 @@ class CallsController extends BaseController
         //   return   $user;
 
         if ($user->is_admin == 3) {
-            return Calls::where('assigned_to', $user->id)->WhereIn('results', [1, 2, 3])->with(['extra.values',  'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user', 'p_sort'])->orderBy('sort', 'ASC')->get();
+            return Calls::where('assigned_to', $user->id)->WhereIn('results', [1, 2, 3, 6])->with(['extra.values',  'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user', 'p_sort'])->orderBy('sort', 'ASC')->get();
         } else if ($user->is_admin == 4) {
 
             $emp = AssignEmployee::where('admin_id', $user->id)->pluck('user_id')->toArray();;
@@ -76,7 +76,7 @@ class CallsController extends BaseController
 
             return  Calls::WhereIn('assigned_to', $emp)
                 ->where(function ($q) {
-                    $q->WhereIn('results', [1, 2, 3]);
+                    $q->WhereIn('results', [1, 2, 3, 6]);
                 })->with(['extra.values',  'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for', 'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user', 'p_sort'])->orderBy('sort', 'ASC')->get();
 
 
@@ -84,7 +84,7 @@ class CallsController extends BaseController
 
             // return $emp;
         } else {
-            return Calls::WhereIn('results', [2, 3])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user', 'p_sort'])->orderBy('sort', 'ASC')->get();
+            return Calls::WhereIn('results', [2, 3, 6])->with(['extra.values', 'history.user.profile', 'goal', 'marital_status', 'want_to_study', 'assigned_to', 'applying_for',  'section', 'results', 'follow_up_call_results', 'priorities', 'statu', 'package', 'cancel_reason', 'user', 'p_sort'])->orderBy('sort', 'ASC')->get();
         }
     }
     private function get_Cancel_calls()
