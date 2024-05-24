@@ -638,9 +638,11 @@ class CallsController extends BaseController
 
             $old_call = Calls::where('id', $id)->select('first_name', 'last_name', 'email', 'phone_number', 'assigned_to')->get();
 
-            if (isset($old_call[0]->email) && $old_call[0]->email !== '') {
-                unset($input['email']);
-            } else if ($input['email'] != '') {
+            // if (isset($old_call[0]->email) && $old_call[0]->email !== '') { // instructions on 21th / may /2024 whatsapp video 2 
+            //     unset($input['email']);
+            // } else 
+            
+            if ($input['email'] != '') { 
                 $messages = [
                     'unique' => 'taken',
                 ];
